@@ -1,6 +1,7 @@
 import { onMounted, onUnmounted, ref } from "vue"
 import { Spacial } from "../../Spacial"
 import { AActor } from "@/libs/AActor"
+import { Point } from "./Core/Point"
 
 class Atlas extends AActor {
     public constructor(parent: Spacial) {
@@ -17,6 +18,8 @@ class Atlas extends AActor {
     private handler: Cesium.ScreenSpaceEventHandler | null = null
 
     private isMouseDown = false
+
+    private points = ref<Map<string, Point>>(new Map<string, Point>())
 
     public InitStates() {
         return {
@@ -195,6 +198,13 @@ class Atlas extends AActor {
     }
 
     private MapLeftClick(e: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
+        const r = this.GetPickAndPosition(e.position)
+        if (r.pick && r.pick.id && r.pick.id.type == "Point") {
+            (r.pick.id.body as Point).OnLeftClick()
+        }
+        else {
+            this.AddPoint(r.tp)
+        }
 
     }
 
@@ -216,6 +226,11 @@ class Atlas extends AActor {
 
     private MapMouseMove(e: Cesium.ScreenSpaceEventHandler.MotionEvent) {
 
+    }
+
+    private AddPoint(p: Cesium.Cartesian3) {
+        const point = new Point({ atlas: this, position: p })
+        this.points.value.set(point.UID, point)
     }
 
     /**
