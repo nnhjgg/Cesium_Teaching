@@ -1,10 +1,18 @@
-import { onMounted, onUnmounted } from "vue"
 import { AActor } from "@/libs/AActor"
-class Vessel extends AActor {
-    public constructor() { super() }
+import { onMounted, onUnmounted, ref } from "vue"
+import { Atlas } from "./Components/Atlas/Atlas"
+
+class Spacial extends AActor {
+    public constructor() {
+        super()
+    }
+
+    public atlas = new Atlas(this)
 
     public InitStates() {
-        return {}
+        return {
+
+        }
     }
 
     public InitHooks() {
@@ -15,6 +23,7 @@ class Vessel extends AActor {
         onMounted(() => {
 
         })
+
         onUnmounted(() => {
             this.Destroy()
         })
@@ -23,6 +32,7 @@ class Vessel extends AActor {
     protected Destroy() {
 
     }
+
 }
 
-export { Vessel }
+export { Spacial }

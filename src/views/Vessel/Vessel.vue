@@ -2,6 +2,7 @@
 // console.log(import.meta.env.VITE_APP_NAME)
 import { provide } from 'vue';
 import { Vessel } from './Vessel';
+import SpacialVue from '@/common/Spacial/Spacial.vue';
 
 const instance = new Vessel()
 provide('instance', instance)
@@ -12,7 +13,7 @@ instance.Run()
 
 <template>
     <div class="Vessel">
-        <n-button type="primary" class="Btn" @click="instance.Test()">Emit</n-button>
+        <SpacialVue></SpacialVue>
     </div>
 </template>
 

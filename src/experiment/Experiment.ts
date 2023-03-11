@@ -13,7 +13,7 @@ class Experiment extends AActor {
 
     private renderer: THREE.WebGLRenderer | null = null;
 
-    private isShow = ref<boolean>(true)
+    private isShow = ref<boolean>(false)
 
     private demoWindow = {
         isShow: false,
