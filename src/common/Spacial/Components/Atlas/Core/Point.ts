@@ -17,7 +17,7 @@ interface IPointEvent {
     OnMidClick: () => void,
     OnRightClick: () => void,
     OnDragStart: () => void,
-    OnDragging: () => void,
+    OnDragging: (e: Cesium.Cartesian3) => void,
     OnDragEnd: () => void,
 }
 
@@ -71,39 +71,39 @@ class Point extends Entity implements IPointEvent {
     }
 
     public OnMouseDown() {
-
+        console.log("OnMouseDown")
     }
 
     public OnMouseUp() {
-
+        console.log("OnMouseUp")
     }
 
     public OnMouseMove(isMouseDown: boolean) {
-
+        console.log("OnMouseMove")
     }
 
     public OnLeftClick() {
-
+        console.log("OnLeftClick")
     }
 
     public OnMidClick() {
-
+        console.log("OnMidClick")
     }
 
     public OnRightClick() {
-
+        console.log("OnRightClick")
     }
 
     public OnDragStart() {
-
+        console.log("OnDragStart")
     }
 
-    public OnDragging() {
-
+    public OnDragging(e: Cesium.Cartesian3) {
+        this.body.position = e as unknown as Cesium.PositionProperty
     }
 
     public OnDragEnd() {
-
+        console.log("OnDragEnd")
     }
 }
 

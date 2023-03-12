@@ -21,6 +21,8 @@ class Atlas extends AActor {
 
     private points = ref<Map<string, Point>>(new Map<string, Point>())
 
+    private currentDragPoint: Point | null = null
+
     public InitStates() {
         return {
             dom: this.dom,
@@ -200,7 +202,8 @@ class Atlas extends AActor {
     private MapLeftClick(e: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
         const r = this.GetPickAndPosition(e.position)
         if (r.pick && r.pick.id && r.pick.id.type == "Point") {
-            (r.pick.id.body as Point).OnLeftClick()
+            const point = r.pick.id.body as Point
+            point.OnLeftClick()
         }
         else {
             this.AddPoint(r.tp)
@@ -209,28 +212,91 @@ class Atlas extends AActor {
     }
 
     private MapMidClick(e: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
-
+        const r = this.GetPickAndPosition(e.position)
+        if (r.pick && r.pick.id && r.pick.id.type == "Point") {
+            const point = r.pick.id.body as Point
+            point.OnMidClick()
+        }
     }
 
     private MapRightClick(e: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
-
+        const r = this.GetPickAndPosition(e.position)
+        if (r.pick && r.pick.id && r.pick.id.type == "Point") {
+            const point = r.pick.id.body as Point
+            point.OnRightClick()
+        }
     }
 
     private MapLeftDown(e: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
         this.isMouseDown = true
+        const r = this.GetPickAndPosition(e.position)
+        if (r.pick && r.pick.id && r.pick.id.type == "Point") {
+            const point = r.pick.id.body as Point
+            this.currentDragPoint = point
+            point.OnMouseDown()
+            point.OnDragStart()
+        }
     }
 
     private MapLeftUp(e: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
         this.isMouseDown = false
+        const r = this.GetPickAndPosition(e.position)
+        if (r.pick && r.pick.id && r.pick.id.type == "Point") {
+            const point = r.pick.id.body as Point
+            point.OnMouseUp()
+        }
+        if (this.currentDragPoint != null) {
+            this.currentDragPoint.OnDragEnd()
+        }
+        this.currentDragPoint = null
+        this.EnableMapMove()
     }
 
     private MapMouseMove(e: Cesium.ScreenSpaceEventHandler.MotionEvent) {
-
+        const r = this.GetPickAndPosition(e.endPosition)
+        if (r.pick && r.pick.id && r.pick.id.type == "Point") {
+            const point = r.pick.id.body as Point
+            point.OnMouseMove(this.isMouseDown)
+        }
+        if (this.isMouseDown) {
+            if (this.currentDragPoint != null) {
+                this.DisableMapMove()
+                if (r.tp) {
+                    this.currentDragPoint.OnDragging(r.tp)
+                }
+            }
+        }
     }
 
     private AddPoint(p: Cesium.Cartesian3) {
         const point = new Point({ atlas: this, position: p })
         this.points.value.set(point.UID, point)
+    }
+
+    /**
+     * 禁止地图移动
+     */
+    private DisableMapMove() {
+        if (this.viewer) {
+            this.viewer.scene.screenSpaceCameraController.enableTranslate = false
+            this.viewer.scene.screenSpaceCameraController.enableRotate = false
+            this.viewer.scene.screenSpaceCameraController.enableZoom = false
+            this.viewer.scene.screenSpaceCameraController.enableTilt = false
+            this.viewer.scene.screenSpaceCameraController.enableLook = false
+        }
+    }
+
+    /**
+     * 开启地图移动
+     */
+    private EnableMapMove() {
+        if (this.viewer) {
+            this.viewer.scene.screenSpaceCameraController.enableTranslate = true
+            this.viewer.scene.screenSpaceCameraController.enableRotate = true
+            this.viewer.scene.screenSpaceCameraController.enableZoom = true
+            this.viewer.scene.screenSpaceCameraController.enableTilt = true
+            this.viewer.scene.screenSpaceCameraController.enableLook = true
+        }
     }
 
     /**
