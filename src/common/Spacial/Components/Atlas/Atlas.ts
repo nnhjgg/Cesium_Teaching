@@ -2,6 +2,7 @@ import { onMounted, onUnmounted, ref } from "vue"
 import { Spacial } from "../../Spacial"
 import { AActor } from "@/libs/AActor"
 import { Point } from "./Core/Point"
+import { Line } from "./Core/Line"
 
 class Atlas extends AActor {
     public constructor(parent: Spacial) {
@@ -23,6 +24,8 @@ class Atlas extends AActor {
 
     private currentDragPoint: Point | null = null
 
+    private line!: Line
+
     public InitStates() {
         return {
             dom: this.dom,
@@ -39,6 +42,7 @@ class Atlas extends AActor {
             this.InitViewer()
             this.InitController()
             this.InitHandler()
+            this.InitLine()
             this.ToTargetPosition(117.23, 31.82)
         })
 
@@ -199,6 +203,10 @@ class Atlas extends AActor {
         }
     }
 
+    private InitLine() {
+        this.line = new Line({ atlas: this })
+    }
+
     private MapLeftClick(e: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
         const r = this.GetPickAndPosition(e.position)
         if (r.pick && r.pick.id && r.pick.id.type == "Point") {
@@ -207,6 +215,7 @@ class Atlas extends AActor {
         }
         else {
             this.AddPoint(r.tp)
+            this.Updateline()
         }
 
     }
@@ -263,8 +272,24 @@ class Atlas extends AActor {
                 this.DisableMapMove()
                 if (r.tp) {
                     this.currentDragPoint.OnDragging(r.tp)
+                    this.Updateline()
                 }
             }
+        }
+    }
+
+    private GetPointsPath() {
+        let path: Array<Cesium.Cartesian3> = []
+        for (let p of this.points.value) {
+            //@ts-ignore
+            path.push(p[1].body.position.getValue(new Cesium.JulianDate()) as Cesium.Cartesian3)
+        }
+        return path
+    }
+
+    private Updateline() {
+        if (this.points.value.size > 1) {
+            this.line.Update(this.GetPointsPath())
         }
     }
 
@@ -313,6 +338,26 @@ class Atlas extends AActor {
         const pick = this.viewer.scene.pick(sp)
         let tp = this.viewer.scene.pickPosition(sp)
         return { pick, tp }
+    }
+
+    /**
+     * 获取经纬度 ( 输入c3 )
+     */
+    public GetLngLatFromC3(c3: Cesium.Cartesian3): { R: number, Q: number, H: number } {
+        if (this.viewer) {
+            let cartographic = this.viewer.scene.globe.ellipsoid.cartesianToCartographic(c3)
+            let R = Cesium.Math.toDegrees(cartographic.longitude)
+            let Q = Cesium.Math.toDegrees(cartographic.latitude)
+            return { R, Q, H: cartographic.height }
+        }
+        return { R: 0, Q: 0, H: 0 }
+    }
+
+    /**
+     * 获取c3 ( 输入经纬度 )
+     */
+    public GetC3FromLngLat(lng: number, lat: number, height: number) {
+        return Cesium.Cartesian3.fromDegrees(lng, lat, height)
     }
 }
 
