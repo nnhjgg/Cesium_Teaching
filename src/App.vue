@@ -10,6 +10,10 @@ const {
   isShow
 } = Experiment.Instance.InitStates()
 
+const {
+
+} = App.Instance.InitStates()
+App.Instance.InitHooks()
 App.Instance.Run()
 </script>
 

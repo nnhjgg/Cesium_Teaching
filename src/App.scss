@@ -11,3 +11,8 @@ body {
     font-family: PFBOLD;
     user-select: none;
 }
+
+.cesium-viewer-bottom,
+.cesium-widget-credits {
+    display: none !important;
+}

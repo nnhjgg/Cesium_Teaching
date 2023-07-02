@@ -1,9 +1,5 @@
-
 import { Together } from "@/decorators/Together"
 
-/**
- * 事件处理类 (最好自定义的类都去继承这个类) 
- */
 @Together.ES
 class EventSystem extends Object {
     constructor() { super() }
@@ -111,7 +107,7 @@ class EventSystem extends Object {
      * @param data [ { } ] 传递参数
      * @description 触发事件 
      */
-    public Emit(key: string, data: {} = {}) {
+    public Emit(key: string, data: Record<any, any> = {}) {
         let cc = this.continue.find(ci => ci.key === key)
         let tc = this.temporary.find(ti => ti.key === key)
         if (cc && tc) {
@@ -136,7 +132,7 @@ class EventSystem extends Object {
     public ClearSingleOnce(key: string) {
         let tc = this.temporary.find(ti => ti.key === key)
         if (tc) {
-            tc.callbacks = []
+            tc.callbacks = tc.callbacks.splice(0, tc.callbacks.length)
         }
     }
 
@@ -149,8 +145,8 @@ class EventSystem extends Object {
         let cc = this.continue.find(ci => ci.key === key)
         let tc = this.temporary.find(ti => ti.key === key)
         if (cc && tc) {
-            cc.callbacks = []
-            tc.callbacks = []
+            cc.callbacks = cc.callbacks.splice(0, cc.callbacks.length)
+            tc.callbacks = tc.callbacks.splice(0, tc.callbacks.length)
         }
         else {
             console.error("事件不存在!")
@@ -162,8 +158,8 @@ class EventSystem extends Object {
      * @description 清空所有事件和所有监听
      */
     public Clear() {
-        this.continue = []
-        this.temporary = []
+        this.continue = this.continue.splice(0, this.continue.length)
+        this.temporary = this.temporary.splice(0, this.temporary.length)
     }
 }
 

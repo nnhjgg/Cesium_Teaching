@@ -10,6 +10,11 @@ class Mathf {
             return value
         }
     }
+
+    static Lerp(a: number, b: number, weight: number) {
+        return a + (b - a) * weight
+    }
+
 }
 
 export { Mathf }
