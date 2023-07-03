@@ -1,9 +1,9 @@
 import { toRaw } from "vue";
 import { TMap } from "../Type";
-import { Entity } from "./Entity";
+import { Actor } from "./Actor";
 import { TMapImageryProvider } from "../Manager/TMapImageryProvider";
 
-class ImageryProvider extends Entity {
+class ImageryProvider extends Actor {
     constructor(options: TMap.IImageryProvider) {
         super(options)
         this.type = 'ImageryProvider'

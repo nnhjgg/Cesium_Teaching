@@ -1,4 +1,4 @@
-import { Entity } from "./Core/Entity"
+import { Actor } from "./Core/Actor"
 import { TMapViewer } from "./Manager/TMapViewer"
 
 namespace TMap {
@@ -8,21 +8,17 @@ namespace TMap {
          */
         container: HTMLElement,
         /**
-         * 是否填充默认底图 [ true ]
+         * 地形地址
          */
-        fillDefaultImagery?: boolean,
+        terrainUrl?: string,
         /**
-         * 是否生成地形 [ false ]
+         * 是否在线
          */
-        isTerrain?: boolean,
+        isOnline?: boolean,
         /**
          * 地图类型
          */
-        type: Cesium.SceneMode,
-        /**
-         * 是否生成房屋 [ false ]
-         */
-        buildings?: boolean,
+        type: Cesium.SceneMode.SCENE2D | Cesium.SceneMode.SCENE3D,
         /**
          * 目标渲染帧率 [ 30 ]
          */
@@ -49,12 +45,18 @@ namespace TMap {
         Bd09,
     }
 
+    export enum PickType {
+        None,
+        Entity,
+        Primitive,
+    }
+
     export interface ITMapImageryProvider {
         url: string,
         crs: Coordinate
     }
 
-    export interface IEntity {
+    export interface IActor {
         /**
          * 容器
          */
@@ -66,19 +68,19 @@ namespace TMap {
         /**
          * 父元素
          */
-        parent?: Entity,
+        parent?: Actor,
         /**
          * 默认位置
          */
         position?: Cesium.Cartesian3
     }
 
-    export interface IPoint extends IEntity {
+    export interface IPoint extends IActor {
         icon?: number,
         scale?: number
     }
 
-    export interface ILine extends IEntity {
+    export interface ILine extends IActor {
         polyline?: Array<Cesium.Cartesian3>
         width?: number
         color?: string,
@@ -93,29 +95,29 @@ namespace TMap {
         fillColor?: string
     }
 
-    export interface IText extends IEntity {
+    export interface IText extends IActor {
         label?: string,
         color?: string,
         fillColor?: string
     }
 
-    export interface IParticleSystem extends IEntity {
+    export interface IParticleSystem extends IActor {
         texture?: string
     }
 
-    export interface IFlatModel extends IEntity {
+    export interface IFlatModel extends IActor {
         url: string,
         bounds: [number, number, number, number],
         zoom?: boolean
     }
 
-    export interface ISpatialModel extends IEntity {
+    export interface ISpatialModel extends IActor {
         url: string,
         definition?: number,
         zoom?: boolean
     }
 
-    export interface ISector extends IEntity {
+    export interface ISector extends IActor {
         radius?: number,
         offset?: number,
         angle?: number
@@ -124,13 +126,13 @@ namespace TMap {
         width?: number
     }
 
-    type ImageryProvider = IEntity & ITMapImageryProvider
+    type ImageryProvider = IActor & ITMapImageryProvider
 
     export interface IImageryProvider extends ImageryProvider {
 
     }
 
-    export interface IGltfModel extends IEntity {
+    export interface IGltfModel extends IActor {
         url: string,
         scale?: number
     }

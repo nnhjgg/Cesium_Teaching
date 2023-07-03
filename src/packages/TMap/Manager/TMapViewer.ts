@@ -1,7 +1,7 @@
 import { EventSystem } from "@/libs/EventSystem";
 import { TMapImageryProvider } from "./TMapImageryProvider";
 import { TMap } from "../Type";
-import { Entity } from "../Core/Entity";
+import { Actor } from "../Core/Actor";
 import { ImageryProvider } from "../Core/ImageryProvider";
 
 class TMapViewer extends EventSystem {
@@ -13,7 +13,9 @@ class TMapViewer extends EventSystem {
         this.InitHandler()
     }
 
-    static mutually = ['PointRoot', 'LineRoot', 'LinePoint', 'RectRoot', 'RectPoint', 'TextRoot', 'ParticleSystemRoot', 'SectorRoot']
+    static entityMutually = ['PointRoot', 'LineRoot', 'LinePoint', 'RectRoot', 'RectPoint', 'TextRoot', 'ParticleSystemRoot', 'SectorRoot']
+
+    static primitiveMutually = ['GltfModelRoot']
 
     static subdomains = ['0', '1', '2', '3', '4', '5', '6', '7']
 
@@ -23,9 +25,9 @@ class TMapViewer extends EventSystem {
 
     private handler!: Cesium.ScreenSpaceEventHandler
 
-    private currentFocus: { type: string, entity: Entity | null, origin: Cesium.Entity | null } = {
+    private currentFocus: { type: string, actor: Actor | null, origin: Cesium.Entity | null } = {
         type: '',
-        entity: null,
+        actor: null,
         origin: null,
     }
 
@@ -79,12 +81,14 @@ class TMapViewer extends EventSystem {
             orderIndependentTranslucency: true,
             automaticallyTrackDataSourceClocks: false,
             // terrainShadows: Cesium.ShadowMode.DISABLED,
-            terrainProvider: this.options.isTerrain ? Cesium.createWorldTerrain() : undefined,
+            terrainProvider: this.options.terrainUrl ? new Cesium.CesiumTerrainProvider({
+                url: this.options.terrainUrl
+            }) : undefined,
             projectionPicker: false,
             requestRenderMode: false,
         })
 
-        if (this.options.fillDefaultImagery == undefined || this.options.fillDefaultImagery == true) {
+        if (this.options.isOnline == undefined || this.options.isOnline == true) {
             const l1 = new ImageryProvider({
                 map: this,
                 url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
@@ -100,10 +104,6 @@ class TMapViewer extends EventSystem {
         this.viewer.scene.debugShowFramesPerSecond = false
         this.viewer.scene.postProcessStages.fxaa.enabled = false
         this.viewer.scene.globe.depthTestAgainstTerrain = true
-
-        if (this.options.buildings) {
-            this.viewer.scene.primitives.add(Cesium.createOsmBuildings())
-        }
     }
 
     private InitController() {
@@ -231,9 +231,19 @@ class TMapViewer extends EventSystem {
             let pick = this.viewer.scene.pick(wp)
             let c3 = this.GetC3FromWindowPosition(wp)
             let ll = this.GetLngLatFromC3(c3)
-            return { target: { entity: pick ? pick.id : null }, c3, ll }
+            if (pick) {
+                if (pick.id && pick.id.type) {
+                    return { type: TMap.PickType.Entity, target: { entity: pick.id, primitive: null }, c3, ll }
+                }
+                else if (pick.primitive && pick.primitive.type) {
+                    return { type: TMap.PickType.Primitive, target: { entity: null, primitive: pick.primitive }, c3, ll }
+                }
+            }
+            else {
+                return { type: TMap.PickType.None, target: { entity: null, primitive: null }, c3, ll }
+            }
         } catch (error) {
-            return { target: { entity: null }, c3: Cesium.Cartesian3.ZERO, ll: { R: 0, Q: 0, H: 0 } }
+            return { type: TMap.PickType.None, target: { entity: null, primitive: null }, c3: Cesium.Cartesian3.ZERO, ll: { R: 0, Q: 0, H: 0 } }
         }
 
     }
@@ -276,13 +286,24 @@ class TMapViewer extends EventSystem {
 
     private OnLeftClick(e: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
         const p = this.GetPositionPick(e.position)
-        if (p.target.entity && p.target.entity.type) {
-            this.currentFocus.type = p.target.entity.type
-            this.currentFocus.entity = p.target.entity.body
-            this.currentFocus.origin = p.target.entity
-            if (TMapViewer.mutually.indexOf(p.target.entity.type) != -1) {
-                const entity = p.target.entity.body as Entity
-                entity.OnClick(p.c3, p.target.entity.id, p.target.entity.type)
+        if (p) {
+            if (p.type == TMap.PickType.Entity) {
+                if (TMapViewer.entityMutually.indexOf(p.target.entity.type) != -1) {
+                    this.currentFocus.type = p.target.entity.type
+                    this.currentFocus.actor = p.target.entity.body
+                    this.currentFocus.origin = p.target.entity
+                    const actor = p.target.entity.body as Actor
+                    actor.OnClick(p.c3, p.target.entity.id || '', p.target.entity.type)
+                }
+            }
+            else if (p.type == TMap.PickType.Primitive) {
+                if (TMapViewer.primitiveMutually.indexOf(p.target.primitive.type) != -1) {
+                    this.currentFocus.type = p.target.primitive.type
+                    this.currentFocus.actor = p.target.primitive.body
+                    this.currentFocus.origin = p.target.primitive
+                    const actor = p.target.primitive.body as Actor
+                    actor.OnClick(p.c3, '', p.target.primitive.type)
+                }
             }
         }
         this.options.OnLeftClick && this.options.OnLeftClick(e)
@@ -303,14 +324,26 @@ class TMapViewer extends EventSystem {
     private OnLeftDown(e: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
         this.isDown = true
         const p = this.GetPositionPick(e.position)
-        if (p.target.entity && p.target.entity.type) {
-            this.currentFocus.type = p.target.entity.type
-            this.currentFocus.entity = p.target.entity.body
-            this.currentFocus.origin = p.target.entity
-            if (TMapViewer.mutually.indexOf(p.target.entity.type) != -1) {
-                this.DisableMapMove()
-                const entity = p.target.entity.body as Entity
-                entity.OnMouseDown(p.c3, p.target.entity.id, p.target.entity.type)
+        if (p) {
+            if (p.type == TMap.PickType.Entity) {
+                if (TMapViewer.entityMutually.indexOf(p.target.entity.type) != -1) {
+                    this.currentFocus.type = p.target.entity.type
+                    this.currentFocus.actor = p.target.entity.body
+                    this.currentFocus.origin = p.target.entity
+                    this.DisableMapMove()
+                    const actor = p.target.entity.body as Actor
+                    actor.OnMouseDown(p.c3, p.target.entity.id || '', p.target.entity.type)
+                }
+            }
+            else if (p.type == TMap.PickType.Primitive) {
+                if (TMapViewer.primitiveMutually.indexOf(p.target.primitive.type) != -1) {
+                    this.currentFocus.type = p.target.primitive.type
+                    this.currentFocus.actor = p.target.primitive.body
+                    this.currentFocus.origin = p.target.primitive
+                    this.DisableMapMove()
+                    const actor = p.target.primitive.body as Actor
+                    actor.OnMouseDown(p.c3, p.target.primitive.id || '', p.target.primitive.type)
+                }
             }
         }
         this.options.OnLeftDown && this.options.OnLeftDown(e)
@@ -318,17 +351,17 @@ class TMapViewer extends EventSystem {
 
     private OnLeftUp(e: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
         this.isDown = false
-        if (this.currentFocus.type != '' && this.currentFocus.entity && this.currentFocus.origin) {
-            if (TMapViewer.mutually.indexOf(this.currentFocus.type) != -1) {
-                const entity = this.currentFocus.entity as Entity
-                entity.OnMouseUp(this.GetC3FromWindowPosition(e.position), this.currentFocus.origin.id, this.currentFocus.type)
+        if (this.currentFocus.type != '' && this.currentFocus.actor && this.currentFocus.origin) {
+            if (TMapViewer.entityMutually.indexOf(this.currentFocus.type) != -1) {
+                const actor = this.currentFocus.actor as Actor
+                actor.OnMouseUp(this.GetC3FromWindowPosition(e.position), this.currentFocus.origin.id || '', this.currentFocus.type)
                 if (this.isDragging) {
-                    entity.OnDraggingEnd(this.GetC3FromWindowPosition(e.position), this.currentFocus.origin.id, this.currentFocus.type)
+                    actor.OnDraggingEnd(this.GetC3FromWindowPosition(e.position), this.currentFocus.origin.id || '', this.currentFocus.type)
                 }
             }
         }
         this.currentFocus.type = ''
-        this.currentFocus.entity = null
+        this.currentFocus.actor = null
         this.currentFocus.origin = null
         this.isDragging = false
         this.EnableMapMove()
@@ -360,15 +393,15 @@ class TMapViewer extends EventSystem {
     }
 
     private OnMove(e: Cesium.ScreenSpaceEventHandler.MotionEvent) {
-        if (this.currentFocus.type != '' && this.currentFocus.entity && this.currentFocus.origin) {
-            if (TMapViewer.mutually.indexOf(this.currentFocus.type) != -1) {
-                const entity = this.currentFocus.entity as Entity
+        if (this.currentFocus.type != '' && this.currentFocus.actor && this.currentFocus.origin) {
+            if (TMapViewer.entityMutually.indexOf(this.currentFocus.type) != -1 || TMapViewer.primitiveMutually.indexOf(this.currentFocus.type) != -1) {
+                const actor = this.currentFocus.actor as Actor
                 if (!this.isDragging) {
-                    entity.OnDraggingStart(this.GetC3FromWindowPosition(e.endPosition), this.currentFocus.origin.id, this.currentFocus.type)
+                    actor.OnDraggingStart(this.GetC3FromWindowPosition(e.endPosition), this.currentFocus.origin.id || '', this.currentFocus.type)
                     this.isDragging = true
                 }
                 else {
-                    entity.OnDragging(this.GetC3FromWindowPosition(e.endPosition), this.currentFocus.origin.id, this.currentFocus.type)
+                    actor.OnDragging(this.GetC3FromWindowPosition(e.endPosition), this.currentFocus.origin.id || '', this.currentFocus.type)
                 }
             }
         }

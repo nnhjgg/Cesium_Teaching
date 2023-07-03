@@ -1,9 +1,9 @@
 import { Coordtransform } from "../Manager/Coordtransform";
 import { TMap } from "../Type";
-import { Entity } from "./Entity";
+import { Actor } from "./Actor";
 import { toRaw } from "vue";
 
-class Sector extends Entity {
+class Sector extends Actor {
     constructor(options: TMap.ISector) {
         super(options)
         this.type = "Sector"

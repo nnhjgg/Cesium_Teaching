@@ -1,8 +1,8 @@
 import { TMap } from "../Type";
-import { Entity } from "./Entity";
+import { Actor } from "./Actor";
 import { toRaw } from "vue";
 
-class TileModel extends Entity {
+class TileModel extends Actor {
     constructor(options: TMap.ISpatialModel) {
         super(options)
         this.type = "TileModel"

@@ -1,8 +1,8 @@
 import { TMap } from "../Type";
-import { Entity } from "./Entity";
+import { Actor } from "./Actor";
 import { toRaw } from "vue";
 
-class Text extends Entity {
+class Text extends Actor {
     constructor(options: TMap.IText) {
         super(options)
         this.type = "Text"
@@ -70,12 +70,6 @@ class Text extends Entity {
         const text = toRaw(this)
         text.root.position = e as unknown as Cesium.PositionProperty
     }
-
-    public GetPosition() {
-        const text = toRaw(this)
-        return text.root.position?.getValue(new Cesium.JulianDate()) as Cesium.Cartesian3
-    }
-
 }
 
 export { Text }

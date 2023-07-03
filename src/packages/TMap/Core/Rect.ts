@@ -1,10 +1,10 @@
 import { toRaw } from "vue";
 import { TMap } from "../Type";
-import { Entity } from "./Entity";
+import { Actor } from "./Actor";
 import startIcon from '../Assets/Icon/lineS.png'
 import { Mathf } from "@/libs/Mathf";
 
-class Rect extends Entity {
+class Rect extends Actor {
     constructor(options: TMap.IRect) {
         super(options)
         this.type = "Rect"
@@ -181,21 +181,6 @@ class Rect extends Entity {
             //@ts-ignore
             p.billboard.scale = scale
         }
-    }
-
-    public GetSideColor() {
-        const rect = toRaw(this)
-        return rect.O.color
-    }
-
-    public GetFillColor() {
-        const rect = toRaw(this)
-        return rect.O.fillColor
-    }
-
-    public GetPointScale() {
-        const rect = toRaw(this)
-        return rect.O.pointScale
     }
 
     public override OnDragging(e: Cesium.Cartesian3, id: string, name: string): void {

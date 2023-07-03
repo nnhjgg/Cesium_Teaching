@@ -1,8 +1,8 @@
 import { TMap } from "../Type";
-import { Entity } from "./Entity";
+import { Actor } from "./Actor";
 import { toRaw } from "vue";
 
-class FlatModel extends Entity {
+class FlatModel extends Actor {
     constructor(options: TMap.IFlatModel) {
         super(options)
         this.type = "FlatModel"

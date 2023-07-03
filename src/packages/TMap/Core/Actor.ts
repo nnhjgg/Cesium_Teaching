@@ -1,20 +1,20 @@
-import { ref } from "vue";
+import { ref, toRaw } from "vue";
 import { TMap } from "../Type";
 import { Time } from "@/libs/Time";
 
-abstract class Entity {
-    constructor(options: TMap.IEntity) {
+abstract class Actor {
+    constructor(options: TMap.IActor) {
         this.options = options
-        this.type = "Entity"
+        this.type = "Actor"
     }
 
     public type!: string
 
     public root!: Cesium.Entity
 
-    public options!: TMap.IEntity
+    public options!: TMap.IActor
 
-    public show = ref<boolean>(false)
+    public show = ref<boolean>(true)
 
     /**
      * 自身唯一id
@@ -43,6 +43,16 @@ abstract class Entity {
     public abstract Hide(): void
 
     public abstract Destroy(): void
+
+    public SwitchVisibility() {
+        const a = toRaw(this)
+        if (a.show.value) {
+            a.Hide()
+        }
+        else {
+            a.Show()
+        }
+    }
 
     /**
      * 鼠标左键点击时
@@ -88,4 +98,4 @@ abstract class Entity {
 
 }
 
-export { Entity }
+export { Actor }

@@ -1,10 +1,10 @@
 import { TMap } from "../Type";
-import { Entity } from "./Entity";
+import { Actor } from "./Actor";
 import { toRaw } from "vue";
 import psIcon from '../Assets/Icon/ps.png'
 import fireIcon from '../Assets/Icon/fire.png'
 
-class ParticleSystem extends Entity {
+class ParticleSystem extends Actor {
     constructor(options: TMap.IParticleSystem) {
         super(options)
         this.type = "ParticleSystem"
@@ -101,12 +101,6 @@ class ParticleSystem extends Entity {
         ps.root.position = e as unknown as Cesium.PositionProperty
         ps.ps.modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(e)
     }
-
-    public GetPosition() {
-        const ps = toRaw(this)
-        return ps.root.position?.getValue(new Cesium.JulianDate()) as Cesium.Cartesian3
-    }
-
 }
 
 export { ParticleSystem }

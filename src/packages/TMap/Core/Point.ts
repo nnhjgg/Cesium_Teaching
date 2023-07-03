@@ -1,5 +1,5 @@
 import { TMap } from "../Type";
-import { Entity } from "./Entity";
+import { Actor } from "./Actor";
 import { toRaw } from "vue";
 import _0 from '../Assets/Icon/_0.png'
 import _1 from '../Assets/Icon/_1.png'
@@ -31,7 +31,7 @@ import _26 from '../Assets/Icon/_26.png'
 import _27 from '../Assets/Icon/_27.png'
 import _28 from '../Assets/Icon/_28.png'
 
-class Point extends Entity {
+class Point extends Actor {
     constructor(options: TMap.IPoint) {
         super(options)
         this.type = "Point"
@@ -110,21 +110,6 @@ class Point extends Entity {
         (point.options as TMap.IPoint).scale = scale
         //@ts-ignore
         point.root.billboard.scale = scale
-    }
-
-    public GetPosition() {
-        const point = toRaw(this)
-        return point.root.position?.getValue(new Cesium.JulianDate()) as Cesium.Cartesian3
-    }
-
-    public GetIcon() {
-        const point = toRaw(this)
-        return point.O.icon
-    }
-
-    public GetIconScale() {
-        const point = toRaw(this)
-        return point.O.scale
     }
 
 }

@@ -1,11 +1,11 @@
 import { toRaw } from "vue";
 import { TMap } from "../Type";
-import { Entity } from "./Entity";
+import { Actor } from "./Actor";
 import startIcon from '../Assets/Icon/lineS.png'
 import midIcon from '../Assets/Icon/lineM.png'
 import stopIcon from '../Assets/Icon/lineE.png'
 
-class Line extends Entity {
+class Line extends Actor {
     constructor(options: TMap.ILine) {
         super(options)
         this.type = "Line"
@@ -177,16 +177,6 @@ class Line extends Entity {
             //@ts-ignore
             p.billboard.scale = scale
         }
-    }
-
-    public GetPointScale() {
-        const line = toRaw(this)
-        return line.O.pointScale
-    }
-
-    public GetColor() {
-        const line = toRaw(this)
-        return line.O.color
     }
 
     public override OnDragging(e: Cesium.Cartesian3, id: string, name: string): void {
