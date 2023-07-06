@@ -103,8 +103,8 @@ class Vessel extends AActor {
 
         const tp = new TMap.Core.TourPath({
             map: this.viewer,
-            turnExtend: 20,
-            turnPadding: 30,
+            turnExtend: 50,
+            turnPadding: 50,
             startDirection: TMap.Type.StartDirection.Left,
             polyline: [this.viewer.GetC3FromLngLat(117.221, 31.820, 100), this.viewer.GetC3FromLngLat(117.224, 31.817, 100), this.viewer.GetC3FromLngLat(117.229, 31.820, 100), this.viewer.GetC3FromLngLat(117.227, 31.821, 100)]
         })

@@ -236,7 +236,7 @@ class TourPath extends Actor {
 
     private GetNearPoints(p: Array<Cesium.Cartesian3>, s: Array<{ a: { x: number, y: number }, b: { x: number, y: number } }>, direction: Cesium.Cartesian3) {
         const tp = toRaw(this)
-        const turnExtend = tp.O.turnExtend || 20
+        const turnExtend = tp.O.turnExtend || 50
         const ll = tp.O.map.GetLngLatFromC3(tp.O.polyline[0])
         const result: Array<Cesium.Cartesian3> = []
         for (let i = 0; i < p.length - 1; i += 2) {
@@ -273,7 +273,7 @@ class TourPath extends Actor {
         const origin = bound[tp.O.startDirection == TMap.StartDirection.Left ? 1 : 0]
         const ho = tp.O.startDirection == TMap.StartDirection.Left ? -1 : 1
 
-        const turnPadding = tp.O.turnPadding || 20
+        const turnPadding = tp.O.turnPadding || 50
         const hDistance = Cesium.Cartesian3.distance(bound[0], bound[1])
         const rayDistance = Cesium.Cartesian3.distance(bound[0], bound[2])
         const hDirection = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(bound[1], bound[0], new Cesium.Cartesian3()), new Cesium.Cartesian3())
