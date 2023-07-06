@@ -68,6 +68,7 @@ class Text extends Actor {
 
     public ChangePosition(e: Cesium.Cartesian3) {
         const text = toRaw(this)
+        text.O.position = e
         text.root.position = e as unknown as Cesium.PositionProperty
     }
 }

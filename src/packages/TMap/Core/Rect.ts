@@ -23,13 +23,13 @@ class Rect extends Actor {
         this.root = this.O.map.V.entities.add({
             name: "RectRoot",
             polyline: {
-                positions: this.O.polyline ? [...this.O.polyline, this.O.polyline[0]] : [],
+                positions: this.O.polyline.length != 0 ? [...this.O.polyline, this.O.polyline[0]] : this.O.polyline,
                 width: this.O.width || 5,
                 material: Cesium.Color.fromCssColorString(this.O.color || '#ff0000'),
             },
             polygon: {
                 //@ts-ignore
-                hierarchy: this.O.polyline || [],
+                hierarchy: this.O.polyline,
                 perPositionHeight: true,
                 outline: false,
                 material: Cesium.Color.fromCssColorString(this.O.fillColor || '#ff000066'),
@@ -43,7 +43,7 @@ class Rect extends Actor {
     }
 
     private CreateDefaultPoints() {
-        if (this.O.polyline) {
+        if (this.O.polyline.length != 0) {
             for (let position of this.O.polyline) {
                 const p = this.O.map.V.entities.add({
                     name: "RectPoint",
@@ -154,6 +154,7 @@ class Rect extends Actor {
         const rect = toRaw(this)
         const path = rect.GetRectPath()
         const r = [...path, path[0]]
+        rect.O.polyline = path
         //@ts-ignore
         rect.root.polyline.positions = r
         //@ts-ignore

@@ -98,6 +98,7 @@ class ParticleSystem extends Actor {
 
     public ChangePosition(e: Cesium.Cartesian3) {
         const ps = toRaw(this)
+        ps.O.position = e
         ps.root.position = e as unknown as Cesium.PositionProperty
         ps.ps.modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(e)
     }

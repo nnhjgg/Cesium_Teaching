@@ -13,7 +13,7 @@ class TMapViewer extends EventSystem {
         this.InitHandler()
     }
 
-    static entityMutually = ['PointRoot', 'LineRoot', 'LinePoint', 'RectRoot', 'RectPoint', 'TextRoot', 'ParticleSystemRoot', 'SectorRoot']
+    static entityMutually = ['PointRoot', 'LineRoot', 'LinePoint', 'RectRoot', 'RectPoint', 'TextRoot', 'ParticleSystemRoot', 'SectorRoot', 'VideoLayerRoot', 'TourPathPoint']
 
     static primitiveMutually = ['GltfModelRoot']
 
@@ -76,7 +76,7 @@ class TMapViewer extends EventSystem {
             sceneMode: this.options.type,
             // mapMode2D: Cesium.MapMode2D.ROTATE,
             shadows: false,
-            showRenderLoopErrors: true,
+            showRenderLoopErrors: false,
             targetFrameRate: this.options.targetFrameRate || 30,
             orderIndependentTranslucency: true,
             automaticallyTrackDataSourceClocks: false,
@@ -88,7 +88,7 @@ class TMapViewer extends EventSystem {
             requestRenderMode: false,
         })
 
-        if (this.options.isOnline == undefined || this.options.isOnline == true) {
+        if (this.options.online == undefined || this.options.online == true) {
             const l1 = new ImageryProvider({
                 map: this,
                 url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',

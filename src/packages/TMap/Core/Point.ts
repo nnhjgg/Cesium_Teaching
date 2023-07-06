@@ -1,35 +1,6 @@
 import { TMap } from "../Type";
 import { Actor } from "./Actor";
 import { toRaw } from "vue";
-import _0 from '../Assets/Icon/_0.png'
-import _1 from '../Assets/Icon/_1.png'
-import _2 from '../Assets/Icon/_2.png'
-import _3 from '../Assets/Icon/_3.png'
-import _4 from '../Assets/Icon/_4.png'
-import _5 from '../Assets/Icon/_5.png'
-import _6 from '../Assets/Icon/_6.png'
-import _7 from '../Assets/Icon/_7.png'
-import _8 from '../Assets/Icon/_8.png'
-import _9 from '../Assets/Icon/_9.png'
-import _10 from '../Assets/Icon/_10.png'
-import _11 from '../Assets/Icon/_11.png'
-import _12 from '../Assets/Icon/_12.png'
-import _13 from '../Assets/Icon/_13.png'
-import _14 from '../Assets/Icon/_14.png'
-import _15 from '../Assets/Icon/_15.png'
-import _16 from '../Assets/Icon/_16.png'
-import _17 from '../Assets/Icon/_17.png'
-import _18 from '../Assets/Icon/_18.png'
-import _19 from '../Assets/Icon/_19.png'
-import _20 from '../Assets/Icon/_20.png'
-import _21 from '../Assets/Icon/_21.png'
-import _22 from '../Assets/Icon/_22.png'
-import _23 from '../Assets/Icon/_23.png'
-import _24 from '../Assets/Icon/_24.png'
-import _25 from '../Assets/Icon/_25.png'
-import _26 from '../Assets/Icon/_26.png'
-import _27 from '../Assets/Icon/_27.png'
-import _28 from '../Assets/Icon/_28.png'
 
 class Point extends Actor {
     constructor(options: TMap.IPoint) {
@@ -37,8 +8,6 @@ class Point extends Actor {
         this.type = "Point"
         this.CreateRoot()
     }
-
-    static icons = [_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28]
 
     private get O() {
         return this.options as TMap.IPoint
@@ -49,7 +18,7 @@ class Point extends Actor {
             name: "PointRoot",
             position: this.O.position,
             billboard: {
-                image: Point.icons[this.O.icon || 0],
+                image: this.O.icon,
                 verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
                 horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
                 scale: this.O.scale || 1,
@@ -93,15 +62,15 @@ class Point extends Actor {
         point.OnDragging(e, id, name)
     }
 
-    public ChangeIcon(index: number) {
+    public ChangeIcon(icon: string) {
         const point = toRaw(this);
-        (point.options as TMap.IPoint).icon = index
         //@ts-ignore
-        point.root.billboard.image = Point.icons[index]
+        point.root.billboard.image = icon
     }
 
     public ChangePosition(e: Cesium.Cartesian3) {
         const point = toRaw(this)
+        point.O.position = e
         point.root.position = e as unknown as Cesium.PositionProperty
     }
 
