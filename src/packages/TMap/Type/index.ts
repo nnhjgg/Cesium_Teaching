@@ -143,16 +143,13 @@ namespace TMap {
         normal?: Cesium.Cartesian3
     }
 
-    export enum StartPoint {
-        LeftTop,
-        RightTop,
-        RightBottom,
-        LeftBottom
+    export enum StartDirection {
+        Left,
+        Right
     }
 
     export interface ITourPath extends IActor {
-        rotate?: number,
-        startPoint?: StartPoint,
+        startDirection: StartDirection,
         boundPadding?: number,
         width?: number,
         wayWidth?: number,
