@@ -352,7 +352,7 @@ class TMapViewer extends EventSystem {
     private OnLeftUp(e: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
         this.isDown = false
         if (this.currentFocus.type != '' && this.currentFocus.actor && this.currentFocus.origin) {
-            if (TMapViewer.entityMutually.indexOf(this.currentFocus.type) != -1) {
+            if (TMapViewer.entityMutually.indexOf(this.currentFocus.type) != -1 || TMapViewer.primitiveMutually.indexOf(this.currentFocus.type) != -1) {
                 const actor = this.currentFocus.actor as Actor
                 actor.OnMouseUp(this.GetC3FromWindowPosition(e.position), this.currentFocus.origin.id || '', this.currentFocus.type)
                 if (this.isDragging) {
