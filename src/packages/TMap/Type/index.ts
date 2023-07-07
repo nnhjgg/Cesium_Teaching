@@ -149,7 +149,6 @@ namespace TMap {
     }
 
     export interface ITourPath extends IActor {
-        startDirection: StartDirection,
         boundPadding?: number,
         width?: number,
         wayWidth?: number,
@@ -159,6 +158,10 @@ namespace TMap {
         polyline: Array<Cesium.Cartesian3>,
         turnExtend?: number,
         turnPadding?: number,
+    }
+
+    export interface IFrustum extends IActor {
+
     }
 }
 

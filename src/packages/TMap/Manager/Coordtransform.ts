@@ -90,11 +90,8 @@ class Coordtransform {
     }
 
     static Wgs84toBd09(lng: number, lat: number) {
-        // wgs84先转为火星坐标系
         const gcj02 = this.Wgs84ToGcj02(lng, lat)
-        // 火星坐标系转百度坐标系
-        const result = this.Gcj02ToBd09(gcj02[0], gcj02[1])
-        return result
+        return this.Gcj02ToBd09(gcj02[0], gcj02[1])
     }
 
     static Gcj02ToBd09(lng: number, lat: number) {

@@ -11,6 +11,7 @@ import { Sector } from "./Sector";
 import { ImageryProvider } from "./ImageryProvider";
 import { VideoLayer } from "./VideoLayer";
 import { TourPath } from "./TourPath";
+import { Frustum } from "./Frustum";
 
 export {
     Actor,
@@ -25,5 +26,6 @@ export {
     Sector,
     ImageryProvider,
     VideoLayer,
-    TourPath
+    TourPath,
+    Frustum,
 }

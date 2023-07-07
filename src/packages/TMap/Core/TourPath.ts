@@ -170,14 +170,6 @@ class TourPath extends Actor {
         }
     }
 
-    private CalculatePath() {
-        const tp = toRaw(this)
-        const order = tp.GetMaxPositionPoint()
-        const bound = tp.GetBound(order)
-        const way = tp.GetWay(order, bound)
-        return way
-    }
-
     private GetMaxPositionPoint(): { minLngIndex: number, maxLngIndex: number, minLatIndex: number, maxLatIndex: number } {
         const tp = toRaw(this)
         let lng: Array<number> = []
@@ -213,6 +205,25 @@ class TourPath extends Actor {
         const _4 = this.O.map.GetC3FromLngLat(maxLngLL.R, minLatLL.Q, minLatLL.H) as Cesium.Cartesian3
 
         return [_1, _2, _3, _4, _1]
+    }
+
+    private ConfirmFlyDirection(s: { minLngIndex: number, maxLngIndex: number, minLatIndex: number, maxLatIndex: number }, bound: Array<Cesium.Cartesian3>) {
+        const tp = toRaw(this)
+        if (tp.O.position) {
+            const l = Cesium.Cartesian3.distance(tp.O.polyline[s.minLngIndex], tp.O.position)
+            const r = Cesium.Cartesian3.distance(tp.O.polyline[s.maxLngIndex], tp.O.position)
+            return l < r ? TMap.StartDirection.Left : TMap.StartDirection.Right
+        }
+        return TMap.StartDirection.Left
+    }
+
+    private CalculatePath() {
+        const tp = toRaw(this)
+        const order = tp.GetMaxPositionPoint()
+        const bound = tp.GetBound(order)
+        const flyDirection = tp.ConfirmFlyDirection(order, bound)
+        const way = tp.GetWay(order, bound, flyDirection)
+        return way
     }
 
     private GetSections() {
@@ -268,10 +279,10 @@ class TourPath extends Actor {
         return result
     }
 
-    private GetWay(s: { minLngIndex: number, maxLngIndex: number, minLatIndex: number, maxLatIndex: number }, bound: Array<Cesium.Cartesian3>) {
+    private GetWay(s: { minLngIndex: number, maxLngIndex: number, minLatIndex: number, maxLatIndex: number }, bound: Array<Cesium.Cartesian3>, flyDirection: TMap.StartDirection) {
         const tp = toRaw(this)
-        const origin = bound[tp.O.startDirection == TMap.StartDirection.Left ? 1 : 0]
-        const ho = tp.O.startDirection == TMap.StartDirection.Left ? -1 : 1
+        const origin = bound[flyDirection == TMap.StartDirection.Left ? 1 : 0]
+        const ho = flyDirection == TMap.StartDirection.Left ? -1 : 1
 
         const turnPadding = tp.O.turnPadding || 50
         const hDistance = Cesium.Cartesian3.distance(bound[0], bound[1])
@@ -310,11 +321,11 @@ class TourPath extends Actor {
             }
         }
 
-        result.unshift(tp.O.position || tp.O.polyline[tp.O.startDirection == TMap.StartDirection.Left ? s.minLngIndex : s.maxLngIndex])
+        result.unshift(tp.O.position || tp.O.polyline[s.minLngIndex])
+
+        // result.push(tp.O.position || tp.O.polyline[s.maxLngIndex])
 
         return result
-
-        // return bound
     }
 
     public OnDragging(e: Cesium.Cartesian3, id: string, name: string): void {

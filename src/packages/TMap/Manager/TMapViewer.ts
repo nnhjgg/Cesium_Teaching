@@ -1,5 +1,4 @@
 import { EventSystem } from "@/libs/EventSystem";
-import { TMapImageryProvider } from "./TMapImageryProvider";
 import { TMap } from "../Type";
 import { Actor } from "../Core/Actor";
 import { ImageryProvider } from "../Core/ImageryProvider";
