@@ -16,8 +16,6 @@ class TMapViewer extends EventSystem {
 
     static primitiveMutually = ['GltfModelRoot']
 
-    static subdomains = ['0', '1', '2', '3', '4', '5', '6', '7']
-
     private options!: TMap.ITMapViewerConstructor
 
     private viewer!: Cesium.Viewer

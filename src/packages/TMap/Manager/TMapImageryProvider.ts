@@ -73,9 +73,11 @@ class TMapImageryProvider extends Cesium.UrlTemplateImageryProvider {
             ...options,
             minimumLevel: 1,
             maximumLevel: 18,
-            subdomains: TMapViewer.subdomains,
+            subdomains: TMapImageryProvider.subdomains,
         })
     }
+
+    static subdomains = ['0', '1', '2', '3', '4', '5', '6', '7']
 }
 
 export { TMapImageryProvider }
