@@ -1,6 +1,5 @@
 import { TMap } from '../Type'
 import { Coordtransform } from './Coordtransform'
-import { TMapViewer } from './TMapViewer'
 
 class TilingScheme extends Cesium.WebMercatorTilingScheme {
     constructor(crs: TMap.Coordinate) {
