@@ -297,7 +297,7 @@ class TourPath extends Actor {
         const sections = tp.GetSections()
         const temp: Array<Cesium.Cartesian3> = []
 
-        let distance = turnPadding
+        let distance = turnPadding / 2
 
         while (distance < hDistance) {
             const current = Cesium.Cartesian3.add(origin, Cesium.Cartesian3.multiplyByScalar(hDirection, distance * ho, new Cesium.Cartesian3()), new Cesium.Cartesian3())
