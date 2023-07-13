@@ -354,7 +354,7 @@ class TMapViewer extends EventSystem {
         const p = this.GetPositionPick(e.position)
         if (p) {
             if (p.type == TMap.PickType.Entity) {
-                if (TMapViewer.entityMutually.indexOf(p.target.entity.type) != -1 && p.target.entity.body.sing == 'T') {
+                if (TMapViewer.entityMutually.indexOf(p.target.entity.type) != -1 && p.target.entity.body.sign == 'Core') {
                     this.currentFocus.type = p.target.entity.type
                     this.currentFocus.actor = p.target.entity.body
                     this.currentFocus.origin = p.target.entity
@@ -363,7 +363,7 @@ class TMapViewer extends EventSystem {
                 }
             }
             else if (p.type == TMap.PickType.Primitive) {
-                if (TMapViewer.primitiveMutually.indexOf(p.target.primitive.type) != -1 && p.target.primitive.body.sing == 'T') {
+                if (TMapViewer.primitiveMutually.indexOf(p.target.primitive.type) != -1 && p.target.primitive.body.sign == 'Core') {
                     this.currentFocus.type = p.target.primitive.type
                     this.currentFocus.actor = p.target.primitive.body
                     this.currentFocus.origin = p.target.primitive
@@ -395,7 +395,7 @@ class TMapViewer extends EventSystem {
         const p = this.GetPositionPick(e.position)
         if (p) {
             if (p.type == TMap.PickType.Entity) {
-                if (TMapViewer.entityMutually.indexOf(p.target.entity.type) != -1 && p.target.entity.body.sing == 'T') {
+                if (TMapViewer.entityMutually.indexOf(p.target.entity.type) != -1 && p.target.entity.body.sign == 'Core') {
                     this.currentFocus.type = p.target.entity.type
                     this.currentFocus.actor = p.target.entity.body
                     this.currentFocus.origin = p.target.entity
@@ -408,7 +408,7 @@ class TMapViewer extends EventSystem {
                 }
             }
             else if (p.type == TMap.PickType.Primitive) {
-                if (TMapViewer.primitiveMutually.indexOf(p.target.primitive.type) != -1 && p.target.primitive.body.sing == 'T') {
+                if (TMapViewer.primitiveMutually.indexOf(p.target.primitive.type) != -1 && p.target.primitive.body.sign == 'Core') {
                     this.currentFocus.type = p.target.primitive.type
                     this.currentFocus.actor = p.target.primitive.body
                     this.currentFocus.origin = p.target.primitive

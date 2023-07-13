@@ -8,7 +8,7 @@ abstract class Actor {
         this.type = "Actor"
     }
 
-    public sign = "T"
+    public sign = "Core"
 
     public type!: string
 
