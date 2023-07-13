@@ -34,6 +34,12 @@ class TMapViewer extends EventSystem {
 
     private draggingDelta = -1
 
+    private currentLayer = TMap.BaseMapType.Sate
+
+    private vectorMap: Array<ImageryProvider> = []
+
+    private sateMap: Array<ImageryProvider> = []
+
     /**
      * 容器原始对象
      */
@@ -74,7 +80,7 @@ class TMapViewer extends EventSystem {
             // mapMode2D: Cesium.MapMode2D.ROTATE,
             shadows: false,
             showRenderLoopErrors: false,
-            targetFrameRate: this.options.targetFrameRate || 30,
+            targetFrameRate: this.options.targetFrameRate || 60,
             orderIndependentTranslucency: true,
             automaticallyTrackDataSourceClocks: false,
             // terrainShadows: Cesium.ShadowMode.DISABLED,
@@ -86,17 +92,48 @@ class TMapViewer extends EventSystem {
         })
 
         if (this.options.online == undefined || this.options.online == true) {
-            const l1 = new ImageryProvider({
+            const v1 = new ImageryProvider({
+                map: this,
+                url: 'https://webrd02.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+                crs: TMap.Coordinate.Gcj02,
+            })
+            this.vectorMap.push(v1)
+
+            const s1 = new ImageryProvider({
                 map: this,
                 url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
                 crs: TMap.Coordinate.Gcj02,
             })
-            const l2 = new ImageryProvider({
+            const s2 = new ImageryProvider({
                 map: this,
                 url: 'https://webst02.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scale=1&style=8',
                 crs: TMap.Coordinate.Gcj02,
             })
+            this.sateMap.push(s1, s2)
         }
+        else {
+            const v1 = new ImageryProvider({
+                map: this,
+                url: `${location.origin}/mapabc/overlay/{z}/{x}/{y}.png`,
+                crs: TMap.Coordinate.Gcj02,
+            })
+
+            this.vectorMap.push(v1)
+
+            const s1 = new ImageryProvider({
+                map: this,
+                url: `${location.origin}/mapabc/satellite/{z}/{x}/{y}.jpg`,
+                crs: TMap.Coordinate.Gcj02,
+            })
+            const s2 = new ImageryProvider({
+                map: this,
+                url: `${location.origin}/mapabc/overlay/{z}/{x}/{y}.png`,
+                crs: TMap.Coordinate.Gcj02,
+            })
+            this.sateMap.push(s1, s2)
+        }
+
+        this.SwitchBaseMapType()
 
         this.viewer.scene.debugShowFramesPerSecond = false
         this.viewer.scene.postProcessStages.fxaa.enabled = false
@@ -281,11 +318,43 @@ class TMapViewer extends EventSystem {
         this.viewer.scene.screenSpaceCameraController.enableLook = true
     }
 
+    /**
+     * 切换地图底图
+     */
+    public SwitchBaseMapType() {
+        if (this.currentLayer == TMap.BaseMapType.Vector) {
+            this.currentLayer = TMap.BaseMapType.Sate
+            for (let v of this.vectorMap) {
+                v.Hide()
+            }
+            for (let s of this.sateMap) {
+                s.Show()
+            }
+        }
+        else if (this.currentLayer == TMap.BaseMapType.Sate) {
+            this.currentLayer = TMap.BaseMapType.Vector
+            for (let v of this.vectorMap) {
+                v.Show()
+            }
+            for (let s of this.sateMap) {
+                s.Hide()
+            }
+        }
+    }
+
+    public ZoomIn() {
+        this.V.camera.zoomIn(100)
+    }
+
+    public ZoomOut() {
+        this.V.camera.zoomOut(100)
+    }
+
     private OnLeftClick(e: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
         const p = this.GetPositionPick(e.position)
         if (p) {
             if (p.type == TMap.PickType.Entity) {
-                if (TMapViewer.entityMutually.indexOf(p.target.entity.type) != -1) {
+                if (TMapViewer.entityMutually.indexOf(p.target.entity.type) != -1 && p.target.entity.body.sing == 'T') {
                     this.currentFocus.type = p.target.entity.type
                     this.currentFocus.actor = p.target.entity.body
                     this.currentFocus.origin = p.target.entity
@@ -294,7 +363,7 @@ class TMapViewer extends EventSystem {
                 }
             }
             else if (p.type == TMap.PickType.Primitive) {
-                if (TMapViewer.primitiveMutually.indexOf(p.target.primitive.type) != -1) {
+                if (TMapViewer.primitiveMutually.indexOf(p.target.primitive.type) != -1 && p.target.primitive.body.sing == 'T') {
                     this.currentFocus.type = p.target.primitive.type
                     this.currentFocus.actor = p.target.primitive.body
                     this.currentFocus.origin = p.target.primitive
@@ -303,6 +372,9 @@ class TMapViewer extends EventSystem {
                 }
             }
         }
+        this.currentFocus.type = ''
+        this.currentFocus.actor = null
+        this.currentFocus.origin = null
         this.options.OnLeftClick && this.options.OnLeftClick(e)
     }
 
@@ -323,17 +395,20 @@ class TMapViewer extends EventSystem {
         const p = this.GetPositionPick(e.position)
         if (p) {
             if (p.type == TMap.PickType.Entity) {
-                if (TMapViewer.entityMutually.indexOf(p.target.entity.type) != -1) {
+                if (TMapViewer.entityMutually.indexOf(p.target.entity.type) != -1 && p.target.entity.body.sing == 'T') {
                     this.currentFocus.type = p.target.entity.type
                     this.currentFocus.actor = p.target.entity.body
                     this.currentFocus.origin = p.target.entity
                     this.DisableMapMove()
                     const actor = p.target.entity.body as Actor
+                    Debug.Log(actor)
+                    Debug.Log(p.target.entity)
+                    Debug.Log(p.target.entity.type)
                     actor.OnMouseDown(p.c3, p.target.entity.id || '', p.target.entity.type)
                 }
             }
             else if (p.type == TMap.PickType.Primitive) {
-                if (TMapViewer.primitiveMutually.indexOf(p.target.primitive.type) != -1) {
+                if (TMapViewer.primitiveMutually.indexOf(p.target.primitive.type) != -1 && p.target.primitive.body.sing == 'T') {
                     this.currentFocus.type = p.target.primitive.type
                     this.currentFocus.actor = p.target.primitive.body
                     this.currentFocus.origin = p.target.primitive
@@ -348,7 +423,7 @@ class TMapViewer extends EventSystem {
 
     private OnLeftUp(e: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
         this.isDown = false
-        if (this.currentFocus.type != '' && this.currentFocus.actor && this.currentFocus.origin) {
+        if (this.currentFocus.type && this.currentFocus.actor && this.currentFocus.origin) {
             if (TMapViewer.entityMutually.indexOf(this.currentFocus.type) != -1 || TMapViewer.primitiveMutually.indexOf(this.currentFocus.type) != -1) {
                 const actor = this.currentFocus.actor as Actor
                 actor.OnMouseUp(this.GetC3FromWindowPosition(e.position), this.currentFocus.origin.id || '', this.currentFocus.type)
@@ -383,14 +458,14 @@ class TMapViewer extends EventSystem {
                 this.OnMove(e)
             }
             this.draggingDelta++
-            if (this.draggingDelta > (this.options.draggingThreshold || 10)) {
+            if (this.draggingDelta > (this.options.draggingThreshold || 5)) {
                 this.draggingDelta = -1
             }
         }
     }
 
     private OnMove(e: Cesium.ScreenSpaceEventHandler.MotionEvent) {
-        if (this.currentFocus.type != '' && this.currentFocus.actor && this.currentFocus.origin) {
+        if (this.currentFocus.type && this.currentFocus.actor && this.currentFocus.origin) {
             if (TMapViewer.entityMutually.indexOf(this.currentFocus.type) != -1 || TMapViewer.primitiveMutually.indexOf(this.currentFocus.type) != -1) {
                 const actor = this.currentFocus.actor as Actor
                 if (!this.isDragging) {
@@ -402,6 +477,7 @@ class TMapViewer extends EventSystem {
                 }
             }
         }
+        this.options.OnMove && this.options.OnMove(e)
     }
 
 }

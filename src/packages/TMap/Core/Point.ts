@@ -81,6 +81,10 @@ class Point extends Actor {
         point.root.billboard.scale = scale
     }
 
+    public OnClick(e: Cesium.Cartesian3, id: string, name: string): void {
+        Debug.Log("AAA")
+    }
+
 }
 
 export { Point }

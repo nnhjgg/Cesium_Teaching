@@ -8,6 +8,8 @@ abstract class Actor {
         this.type = "Actor"
     }
 
+    public sign = "T"
+
     public type!: string
 
     public root!: Cesium.Entity

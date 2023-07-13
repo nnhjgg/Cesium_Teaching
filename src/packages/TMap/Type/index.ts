@@ -20,11 +20,11 @@ namespace TMap {
          */
         type: Cesium.SceneMode.SCENE2D | Cesium.SceneMode.SCENE3D,
         /**
-         * 目标渲染帧率 [ 30 ]
+         * 目标渲染帧率 [ 60 ]
          */
         targetFrameRate?: number,
         /**
-         * 目标事件触发间隔 [ 10 ]
+         * 目标事件触发间隔 [ 5 ]
          */
         draggingThreshold?: number,
         OnLeftClick?: (e: Cesium.ScreenSpaceEventHandler.PositionedEvent) => void,
@@ -56,6 +56,17 @@ namespace TMap {
         crs: Coordinate
     }
 
+    export enum BaseMapType {
+        /**
+         * 矢量地图
+         */
+        Vector,
+        /**
+         * 影像地图
+         */
+        Sate,
+    }
+
     export interface IActor {
         /**
          * 容器
@@ -72,7 +83,11 @@ namespace TMap {
         /**
          * 默认位置
          */
-        position?: Cesium.Cartesian3
+        position?: Cesium.Cartesian3,
+        /**
+         * 默认显示 [ true ]
+         */
+        show?: boolean
     }
 
     export interface IPoint extends IActor {
@@ -161,7 +176,23 @@ namespace TMap {
     }
 
     export interface IFrustum extends IActor {
+        position: Cesium.Cartesian3,
+        fov?: number,
+        aspectRatio?: number
+        near?: number,
+        far?: number
+        heading?: number;
+        pitch?: number;
+        roll?: number;
+        color?: string
+        outlineColor?: string
+    }
 
+    export interface ISimpleAlong {
+        target: Cesium.Camera,
+        duration?: number,
+        loop?: boolean,
+        path: Array<Cesium.Cartesian3>
     }
 }
 
