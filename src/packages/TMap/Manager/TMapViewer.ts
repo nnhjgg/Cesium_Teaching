@@ -401,9 +401,6 @@ class TMapViewer extends EventSystem {
                     this.currentFocus.origin = p.target.entity
                     this.DisableMapMove()
                     const actor = p.target.entity.body as Actor
-                    Debug.Log(actor)
-                    Debug.Log(p.target.entity)
-                    Debug.Log(p.target.entity.type)
                     actor.OnMouseDown(p.c3, p.target.entity.id || '', p.target.entity.type)
                 }
             }
