@@ -77,7 +77,7 @@ class Coordtransform {
      * @author Together
      * @param oLng 原始经度
      * @param oLat 原始纬度
-     * @param angle 偏移角度 ( 0 为正东方向 90正北 )
+     * @param angle 偏移角度
      * @param distance 偏移距离
      * @description 偏移经纬度
      * @return 

@@ -199,30 +199,85 @@ class TourPath extends Actor {
         const minLatLL = this.O.map.GetLngLatFromC3(tp.O.polyline[s.minLatIndex])
         const maxLatLL = this.O.map.GetLngLatFromC3(tp.O.polyline[s.maxLatIndex])
 
-        const _1 = this.O.map.GetC3FromLngLat(maxLngLL.R, maxLatLL.Q, maxLatLL.H) as Cesium.Cartesian3
-        const _2 = this.O.map.GetC3FromLngLat(minLngLL.R, maxLatLL.Q, maxLatLL.H) as Cesium.Cartesian3
-        const _3 = this.O.map.GetC3FromLngLat(minLngLL.R, minLatLL.Q, minLatLL.H) as Cesium.Cartesian3
-        const _4 = this.O.map.GetC3FromLngLat(maxLngLL.R, minLatLL.Q, minLatLL.H) as Cesium.Cartesian3
+        const _1 = this.O.map.GetC3FromLngLat(minLngLL.R, maxLatLL.Q, maxLatLL.H) as Cesium.Cartesian3
+        const _2 = this.O.map.GetC3FromLngLat(maxLngLL.R, maxLatLL.Q, maxLatLL.H) as Cesium.Cartesian3
+        const _3 = this.O.map.GetC3FromLngLat(maxLngLL.R, minLatLL.Q, minLatLL.H) as Cesium.Cartesian3
+        const _4 = this.O.map.GetC3FromLngLat(minLngLL.R, minLatLL.Q, minLatLL.H) as Cesium.Cartesian3
 
         return [_1, _2, _3, _4, _1]
     }
 
-    private ConfirmFlyDirection(s: { minLngIndex: number, maxLngIndex: number, minLatIndex: number, maxLatIndex: number }, bound: Array<Cesium.Cartesian3>) {
+    private GetDirection(bound: Array<Cesium.Cartesian3>) {
         const tp = toRaw(this)
-        if (tp.O.position) {
-            const l = Cesium.Cartesian3.distance(tp.O.polyline[s.minLngIndex], tp.O.position)
-            const r = Cesium.Cartesian3.distance(tp.O.polyline[s.maxLngIndex], tp.O.position)
-            return l < r ? TMap.StartDirection.Left : TMap.StartDirection.Right
+        const rotate = Math.abs((tp.O.rotate || 0)) % 360
+        const oll = tp.O.map.GetLngLatFromC3(bound[0])
+        const rll = Coordtransform.Offset(oll.R, oll.Q, (tp.O.rotate || 0), 100)
+        const rt = tp.O.map.GetC3FromLngLat(rll[0], rll[1], oll.H)
+        const r = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(rt, bound[0], new Cesium.Cartesian3()), new Cesium.Cartesian3())
+
+        const l1 = Cesium.Cartesian3.distance(bound[0], bound[1])
+        const l2 = Cesium.Cartesian3.distance(bound[1], bound[2])
+        const l3 = Cesium.Cartesian3.distance(bound[0], bound[2])
+        const t = l2 / l1
+        const bo = Math.atan(t) / Mathf.Deg2Rad
+
+        let p!: Cesium.Cartesian3
+        let s!: Cesium.Cartesian3
+        let l!: number
+        if (rotate < 91) {
+            s = bound[0]
+            const ll = tp.O.map.GetLngLatFromC3(s)
+            const pll = Coordtransform.Offset(ll.R, ll.Q, (tp.O.rotate || 0) + 90, 100)
+            const pt = tp.O.map.GetC3FromLngLat(pll[0], pll[1], ll.H)
+            p = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(pt, s, new Cesium.Cartesian3()), new Cesium.Cartesian3())
+
+            const a1 = 90 - rotate
+            const ar = 90 - a1 - bo
+            l = l3 * Math.cos(ar * Mathf.Deg2Rad)
         }
-        return TMap.StartDirection.Left
+        else if (rotate > 90 && rotate < 181) {
+            s = bound[3]
+            const ll = tp.O.map.GetLngLatFromC3(s)
+            const pll = Coordtransform.Offset(ll.R, ll.Q, (tp.O.rotate || 0) - 90, 100)
+            const pt = tp.O.map.GetC3FromLngLat(pll[0], pll[1], ll.H)
+            p = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(pt, s, new Cesium.Cartesian3()), new Cesium.Cartesian3())
+
+            const a1 = 180 - rotate
+            const ar = bo - a1
+            l = l3 * Math.cos(ar * Mathf.Deg2Rad)
+        }
+        else if (rotate > 180 && rotate < 271) {
+            s = bound[2]
+            const ll = tp.O.map.GetLngLatFromC3(s)
+            const pll = Coordtransform.Offset(ll.R, ll.Q, (tp.O.rotate || 0) + 90, 100)
+            const pt = tp.O.map.GetC3FromLngLat(pll[0], pll[1], ll.H)
+            p = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(pt, s, new Cesium.Cartesian3()), new Cesium.Cartesian3())
+
+            const a1 = 270 - rotate
+            const ar = 90 - a1 - bo
+            l = l3 * Math.cos(ar * Mathf.Deg2Rad)
+
+        }
+        else if (rotate > 270 && rotate < 361) {
+            s = bound[1]
+            const ll = tp.O.map.GetLngLatFromC3(s)
+            const pll = Coordtransform.Offset(ll.R, ll.Q, (tp.O.rotate || 0) - 90, 100)
+            const pt = tp.O.map.GetC3FromLngLat(pll[0], pll[1], ll.H)
+            p = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(pt, s, new Cesium.Cartesian3()), new Cesium.Cartesian3())
+
+            const a1 = 360 - rotate
+            const ar = bo - a1
+            l = l3 * Math.cos(ar * Mathf.Deg2Rad)
+        }
+        return { r, p, s, l, d: l3 }
     }
 
     private CalculatePath() {
         const tp = toRaw(this)
         const order = tp.GetMaxPositionPoint()
         const bound = tp.GetBound(order)
-        const flyDirection = tp.ConfirmFlyDirection(order, bound)
-        const way = tp.GetWay(order, bound, flyDirection)
+        const direction = tp.GetDirection(bound)
+        const way = tp.GetWay(order, bound, direction)
         return way
     }
 
@@ -245,69 +300,80 @@ class TourPath extends Actor {
         return sections
     }
 
-    private GetNearPoints(p: Array<Cesium.Cartesian3>, s: Array<{ a: { x: number, y: number }, b: { x: number, y: number } }>, direction: Cesium.Cartesian3) {
+    private CalculateFromRotate(input: Array<{ x: number, y: number }>, direction: Cesium.Cartesian3) {
         const tp = toRaw(this)
         const turnExtend = tp.O.turnExtend || 50
-        const ll = tp.O.map.GetLngLatFromC3(tp.O.polyline[0])
+        const xs = input.map(i => i.x)
+        const ys = input.map(i => i.y)
+        const ho = tp.O.rotate && tp.O.rotate > 90 && tp.O.rotate < 270 ? -1 : 1
+        if (tp.O.type == 'lng') {
+            let max = Math.max(...xs)
+            let min = Math.min(...xs)
+            let maxIndex = xs.findIndex(a => a == max)
+            let minIndex = xs.findIndex(a => a == min)
+            const c1 = tp.O.map.GetC3FromLngLat(input[maxIndex].x, input[maxIndex].y, tp.O.height || 100)
+            const c2 = tp.O.map.GetC3FromLngLat(input[minIndex].x, input[minIndex].y, tp.O.height || 100)
+            const c1r = Cesium.Cartesian3.add(c1, Cesium.Cartesian3.multiplyByScalar(direction, turnExtend * ho, new Cesium.Cartesian3()), new Cesium.Cartesian3())
+            const c2r = Cesium.Cartesian3.add(c2, Cesium.Cartesian3.multiplyByScalar(direction, -turnExtend * ho, new Cesium.Cartesian3()), new Cesium.Cartesian3())
+            return [c1r, c2r]
+        }
+        else {
+            let max = Math.max(...ys)
+            let min = Math.min(...ys)
+            let maxIndex = ys.findIndex(a => a == max)
+            let minIndex = ys.findIndex(a => a == min)
+            const c1 = tp.O.map.GetC3FromLngLat(input[maxIndex].x, input[maxIndex].y, tp.O.height || 100)
+            const c2 = tp.O.map.GetC3FromLngLat(input[minIndex].x, input[minIndex].y, tp.O.height || 100)
+            const c1r = Cesium.Cartesian3.add(c1, Cesium.Cartesian3.multiplyByScalar(direction, turnExtend * ho, new Cesium.Cartesian3()), new Cesium.Cartesian3())
+            const c2r = Cesium.Cartesian3.add(c2, Cesium.Cartesian3.multiplyByScalar(direction, -turnExtend * ho, new Cesium.Cartesian3()), new Cesium.Cartesian3())
+            return [c1r, c2r]
+        }
+    }
+
+    private GetCollisionPoints(l: Array<{ a: { x: number, y: number }, b: { x: number, y: number } }>, r: Array<{ a: { x: number, y: number }, b: { x: number, y: number } }>, direction: Cesium.Cartesian3) {
+        const tp = toRaw(this)
         const result: Array<Cesium.Cartesian3> = []
-        for (let i = 0; i < p.length - 1; i += 2) {
-            let temp: Array<number> = []
-            const _1 = tp.O.map.GetLngLatFromC3(p[i])
-            const _2 = tp.O.map.GetLngLatFromC3(p[i + 1])
-            for (let o of s) {
-                const r = Mathf.GetLinesCrossoverPoint({ a: { x: _1.R, y: _1.Q }, b: { x: _2.R, y: _2.Q } }, { c: { x: o.a.x, y: o.a.y }, d: { x: o.b.x, y: o.b.y } })
-                if (r.r) {
-                    temp.push(r.intersect.y)
+        for (let c of l) {
+            let temp: Array<{ x: number, y: number }> = []
+            for (let o of r) {
+                const t = Mathf.GetLinesCrossoverPoint({ a: { x: c.a.x, y: c.a.y }, b: { x: c.b.x, y: c.b.y } }, { c: { x: o.a.x, y: o.a.y }, d: { x: o.b.x, y: o.b.y } })
+                if (t.r) {
+                    temp.push(t.intersect)
                 }
             }
             if (temp.length < 2) {
-                temp = [_1.Q, _2.Q]
+                /**
+                 * 自己想想我这里为什么 continue 而不进行判断
+                 */
+                // temp = [{ x: c.a.x, y: c.a.y }, { x: c.b.x, y: c.b.y }]
+                continue
             }
-            let max = Math.max(...temp)
-            let min = Math.min(...temp)
-            let maxIndex = temp.findIndex(a => a == max)
-            let minIndex = temp.findIndex(a => a == min)
-            const tpc = tp.O.map.GetC3FromLngLat(_1.R, temp[maxIndex], ll.H) as Cesium.Cartesian3
-            const bpc = tp.O.map.GetC3FromLngLat(_1.R, temp[minIndex], ll.H) as Cesium.Cartesian3
 
-            const tpr = Cesium.Cartesian3.add(tpc, Cesium.Cartesian3.multiplyByScalar(direction, turnExtend, new Cesium.Cartesian3()), new Cesium.Cartesian3())
-            const bpr = Cesium.Cartesian3.add(bpc, Cesium.Cartesian3.multiplyByScalar(direction, -turnExtend, new Cesium.Cartesian3()), new Cesium.Cartesian3())
-
-            result.push(tpr, bpr)
-
+            result.push(...tp.CalculateFromRotate(temp, direction))
         }
         return result
     }
 
-    private GetWay(s: { minLngIndex: number, maxLngIndex: number, minLatIndex: number, maxLatIndex: number }, bound: Array<Cesium.Cartesian3>, flyDirection: TMap.StartDirection) {
+    private GetWay(s: { minLngIndex: number, maxLngIndex: number, minLatIndex: number, maxLatIndex: number }, bound: Array<Cesium.Cartesian3>, direction: { r: Cesium.Cartesian3, p: Cesium.Cartesian3, s: Cesium.Cartesian3, l: number, d: number }) {
         const tp = toRaw(this)
-        const origin = bound[flyDirection == TMap.StartDirection.Left ? 1 : 0]
-        const ho = flyDirection == TMap.StartDirection.Left ? -1 : 1
-
-        const turnPadding = tp.O.turnPadding || 50
-        const hDistance = Cesium.Cartesian3.distance(bound[0], bound[1])
-        const rayDistance = Cesium.Cartesian3.distance(bound[0], bound[2])
-        const hDirection = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(bound[1], bound[0], new Cesium.Cartesian3()), new Cesium.Cartesian3())
-
-        const oll = tp.O.map.GetLngLatFromC3(origin)
-        const vll = Coordtransform.Offset(oll.R, oll.Q, 0, 100)
-        const vp = tp.O.map.GetC3FromLngLat(vll[0], vll[1], oll.H)
-        const direction = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(vp, origin, new Cesium.Cartesian3()), new Cesium.Cartesian3())
 
         const sections = tp.GetSections()
-        const temp: Array<Cesium.Cartesian3> = []
+        const temp: Array<{ a: { x: number, y: number }, b: { x: number, y: number } }> = []
 
+        const turnPadding = tp.O.turnPadding || 50
         let distance = turnPadding / 2
 
-        while (distance < hDistance) {
-            const current = Cesium.Cartesian3.add(origin, Cesium.Cartesian3.multiplyByScalar(hDirection, distance * ho, new Cesium.Cartesian3()), new Cesium.Cartesian3())
-            const w1 = Cesium.Cartesian3.add(current, Cesium.Cartesian3.multiplyByScalar(direction, rayDistance, new Cesium.Cartesian3()), new Cesium.Cartesian3())
-            const w2 = Cesium.Cartesian3.subtract(current, Cesium.Cartesian3.multiplyByScalar(direction, rayDistance, new Cesium.Cartesian3()), new Cesium.Cartesian3())
-            temp.push(w1, w2)
+        while (distance < direction.l) {
+            const current = Cesium.Cartesian3.add(direction.s, Cesium.Cartesian3.multiplyByScalar(direction.p, distance, new Cesium.Cartesian3()), new Cesium.Cartesian3())
+            const w1 = Cesium.Cartesian3.add(current, Cesium.Cartesian3.multiplyByScalar(direction.r, direction.d, new Cesium.Cartesian3()), new Cesium.Cartesian3())
+            const a = tp.O.map.GetLngLatFromC3(w1)
+            const w2 = Cesium.Cartesian3.add(current, Cesium.Cartesian3.multiplyByScalar(direction.r, -direction.d, new Cesium.Cartesian3()), new Cesium.Cartesian3())
+            const b = tp.O.map.GetLngLatFromC3(w2)
+            temp.push({ a: { x: a.R, y: a.Q }, b: { x: b.R, y: b.Q } })
             distance += turnPadding
         }
 
-        const result = tp.GetNearPoints(temp, sections, direction)
+        const result = tp.GetCollisionPoints(temp, sections, direction.r)
 
         for (let i = 0; i < result.length - 1; i++) {
             if (i % 4 == 2) {
@@ -317,13 +383,8 @@ class TourPath extends Actor {
                     result[i] = r
                     result[i + 1] = l
                 }
-
             }
         }
-
-        result.unshift(tp.O.position || tp.O.polyline[s.minLngIndex])
-
-        // result.push(tp.O.position || tp.O.polyline[s.maxLngIndex])
 
         return result
     }

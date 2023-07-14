@@ -158,11 +158,6 @@ namespace TMap {
         normal?: Cesium.Cartesian3
     }
 
-    export enum StartDirection {
-        Left,
-        Right
-    }
-
     export interface ITourPath extends IActor {
         boundPadding?: number,
         width?: number,
@@ -173,6 +168,12 @@ namespace TMap {
         polyline: Array<Cesium.Cartesian3>,
         turnExtend?: number,
         turnPadding?: number,
+        rotate?: number,
+        height?: number,
+        /**
+         * 一些细微算法的区别 其实影响不大 因为我自己这套算法有点缺陷
+         */
+        type?: 'lng' | 'lat'
     }
 
     export interface IFrustum extends IActor {
