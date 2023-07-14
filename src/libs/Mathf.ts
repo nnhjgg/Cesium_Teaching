@@ -30,11 +30,22 @@ class Mathf {
     }
 
     /**
-     * 转化为弧度(rad)
+     * 转化为弧度
      */
     static Rad(d: number) {
-        return d * Math.PI / 180.0
+        return d * this.Deg2Rad
     }
+
+    /**
+     * 转化为角度
+     */
+    static Deg(r: number) {
+        return r * this.Rad2Deg
+    }
+
+    static Deg2Rad = 0.017453292;
+
+    static Rad2Deg = 57.29578;
 
     /**
      * 判断俩条线是否相交
