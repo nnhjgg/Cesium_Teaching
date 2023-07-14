@@ -103,21 +103,21 @@ class TourPath extends Actor {
 
     public InsertPoint(e: Cesium.Cartesian3) {
         const tp = toRaw(this)
-        const p = this.O.map.V.entities.add({
+        const p = tp.O.map.V.entities.add({
             name: "TourPathPoint",
             position: e,
             billboard: {
                 image: startIcon,
                 verticalOrigin: Cesium.VerticalOrigin.CENTER,
                 horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
-                scale: this.O.pointScale || 1.4,
+                scale: tp.O.pointScale || 1.4,
                 disableDepthTestDistance: 50000,
             }
         })
         //@ts-ignore
         p.type = 'TourPathPoint'
         //@ts-ignore
-        p.body = this
+        p.body = tp
         tp.points.push(p)
         tp.UpdatePath()
         tp.UpdateTourPath()

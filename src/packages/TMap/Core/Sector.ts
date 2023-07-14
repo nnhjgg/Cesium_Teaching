@@ -59,19 +59,20 @@ class Sector extends Actor {
     }
 
     private GeneratePath() {
+        const sector = toRaw(this)
         const path: Array<Cesium.Cartesian3> = []
-        const r = this.O.map.GetLngLatFromC3(this.O.position || Cesium.Cartesian3.ZERO)
-        const a = Coordtransform.Offset(r.R, r.Q, 90, this.O.radius || 2000)
-        const b = Coordtransform.Offset(r.R, r.Q, 0, this.O.radius || 2000)
+        const r = this.O.map.GetLngLatFromC3(sector.O.position || Cesium.Cartesian3.ZERO)
+        const a = Coordtransform.Offset(r.R, r.Q, 90, sector.O.radius || 2000)
+        const b = Coordtransform.Offset(r.R, r.Q, 0, sector.O.radius || 2000)
         const lngD = a[0] - r.R
         const latD = b[1] - r.Q
 
-        path.push(this.O.position || Cesium.Cartesian3.ZERO)
-        for (let i = 0; i < ((this.O.angle || 360) + 1); i++) {
-            const ll = [r.R + lngD * Math.sin(Sector.once * (i + (this.O.offset || 0))), r.Q + latD * Math.cos(Sector.once * (i + (this.O.offset || 0)))]
-            path.push(this.O.map.GetC3FromLngLat(ll[0], ll[1], r.H))
+        path.push(sector.O.position || Cesium.Cartesian3.ZERO)
+        for (let i = 0; i < ((sector.O.angle || 360) + 1); i++) {
+            const ll = [r.R + lngD * Math.sin(Sector.once * (i + (sector.O.offset || 0))), r.Q + latD * Math.cos(Sector.once * (i + (sector.O.offset || 0)))]
+            path.push(sector.O.map.GetC3FromLngLat(ll[0], ll[1], r.H))
         }
-        path.push(this.O.position || Cesium.Cartesian3.ZERO)
+        path.push(sector.O.position || Cesium.Cartesian3.ZERO)
         return path
     }
 
@@ -79,10 +80,10 @@ class Sector extends Actor {
         const sector = toRaw(this)
         if (sector.O.dragable == undefined || sector.O.dragable) {
             if (name == 'SectorRoot') {
-                const delta = Cesium.Cartesian3.subtract(e, this.downPosition, new Cesium.Cartesian3())
-                this.O.position = Cesium.Cartesian3.add((this.O.position || Cesium.Cartesian3.ZERO), delta, new Cesium.Cartesian3())
-                const path = this.GeneratePath()
-                this.downPosition = e
+                const delta = Cesium.Cartesian3.subtract(e, sector.downPosition, new Cesium.Cartesian3())
+                sector.O.position = Cesium.Cartesian3.add((sector.O.position || Cesium.Cartesian3.ZERO), delta, new Cesium.Cartesian3())
+                const path = sector.GeneratePath()
+                sector.downPosition = e
                 //@ts-ignore
                 sector.root.polyline.positions = [...path, path[0]]
                 //@ts-ignore
@@ -102,7 +103,8 @@ class Sector extends Actor {
     }
 
     public override OnMouseDown(e: Cesium.Cartesian3, id: string, name: string): void {
-        this.downPosition = e
+        const sector = toRaw(this)
+        sector.downPosition = e
     }
 }
 

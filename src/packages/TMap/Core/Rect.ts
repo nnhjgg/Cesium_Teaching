@@ -85,7 +85,7 @@ class Rect extends Actor {
 
     public override Destroy() {
         const rect = toRaw(this)
-        rect.O.map.V.entities.remove(this.root)
+        rect.O.map.V.entities.remove(rect.root)
         for (let p of rect.points) {
             rect.O.map.V.entities.remove(p)
         }
@@ -93,21 +93,21 @@ class Rect extends Actor {
 
     public InsertPoint(e: Cesium.Cartesian3) {
         const rect = toRaw(this)
-        const p = this.O.map.V.entities.add({
+        const p = rect.O.map.V.entities.add({
             name: "RectPoint",
             position: e,
             billboard: {
                 image: startIcon,
                 verticalOrigin: Cesium.VerticalOrigin.CENTER,
                 horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
-                scale: this.O.pointScale || 1.4,
+                scale: rect.O.pointScale || 1.4,
                 disableDepthTestDistance: 50000,
             }
         })
         //@ts-ignore
         p.type = 'RectPoint'
         //@ts-ignore
-        p.body = this
+        p.body = rect
         rect.points.push(p)
         rect.UpdateRectPath()
     }
@@ -188,12 +188,12 @@ class Rect extends Actor {
         const rect = toRaw(this)
         if (name == 'RectRoot') {
             if (rect.O.totalDragable) {
-                const delta = Cesium.Cartesian3.subtract(e, this.downPosition, new Cesium.Cartesian3())
+                const delta = Cesium.Cartesian3.subtract(e, rect.downPosition, new Cesium.Cartesian3())
                 for (let p of rect.points) {
                     p.position = Cesium.Cartesian3.add((p.position?.getValue(new Cesium.JulianDate()) as Cesium.Cartesian3), delta, new Cesium.Cartesian3()) as unknown as Cesium.PositionProperty
                 }
-                this.downPosition = e
-                this.UpdateRectPath()
+                rect.downPosition = e
+                rect.UpdateRectPath()
             }
         }
         else if (name == 'RectPoint') {
@@ -213,7 +213,8 @@ class Rect extends Actor {
     }
 
     public override OnMouseDown(e: Cesium.Cartesian3, id: string, name: string): void {
-        this.downPosition = e
+        const rect = toRaw(this)
+        rect.downPosition = e
     }
 }
 

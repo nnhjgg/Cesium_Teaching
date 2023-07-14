@@ -56,7 +56,7 @@ class TileModel extends Actor {
 
     public override Destroy() {
         const tm = toRaw(this)
-        this.O.map.V.scene.primitives.remove(tm.tile)
+        tm.O.map.V.scene.primitives.remove(tm.tile)
     }
 }
 

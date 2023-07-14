@@ -82,9 +82,8 @@ class Point extends Actor {
     }
 
     public OnClick(e: Cesium.Cartesian3, id: string, name: string): void {
-        Debug.Log("AAA")
-    }
 
+    }
 }
 
 export { Point }

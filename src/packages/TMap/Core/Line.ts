@@ -81,7 +81,7 @@ class Line extends Actor {
 
     public override Destroy() {
         const line = toRaw(this)
-        line.O.map.V.entities.remove(this.root)
+        line.O.map.V.entities.remove(line.root)
         for (let p of line.points) {
             line.O.map.V.entities.remove(p)
         }
@@ -89,21 +89,21 @@ class Line extends Actor {
 
     public InsertPoint(e: Cesium.Cartesian3) {
         const line = toRaw(this)
-        const p = this.O.map.V.entities.add({
+        const p = line.O.map.V.entities.add({
             name: "LinePoint",
             position: e,
             billboard: {
                 image: Line.icons[line.points.length == 0 ? 0 : 2],
                 verticalOrigin: Cesium.VerticalOrigin.CENTER,
                 horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
-                scale: this.O.pointScale || 1.4,
+                scale: line.O.pointScale || 1.4,
                 disableDepthTestDistance: 50000,
             }
         })
         //@ts-ignore
         p.type = 'LinePoint'
         //@ts-ignore
-        p.body = this
+        p.body = line
         line.points.push(p)
         line.UpdateLinePath()
         line.UpdatePointsIcon()
@@ -185,12 +185,12 @@ class Line extends Actor {
         const line = toRaw(this)
         if (name == 'LineRoot') {
             if (line.O.totalDragable) {
-                const delta = Cesium.Cartesian3.subtract(e, this.downPosition, new Cesium.Cartesian3())
+                const delta = Cesium.Cartesian3.subtract(e, line.downPosition, new Cesium.Cartesian3())
                 for (let p of line.points) {
                     p.position = Cesium.Cartesian3.add((p.position?.getValue(new Cesium.JulianDate()) as Cesium.Cartesian3), delta, new Cesium.Cartesian3()) as unknown as Cesium.PositionProperty
                 }
-                this.downPosition = e
-                this.UpdateLinePath()
+                line.downPosition = e
+                line.UpdateLinePath()
             }
         }
         else if (name == 'LinePoint') {
@@ -210,7 +210,8 @@ class Line extends Actor {
     }
 
     public override OnMouseDown(e: Cesium.Cartesian3, id: string, name: string): void {
-        this.downPosition = e
+        const line = toRaw(this)
+        line.downPosition = e
     }
 }
 

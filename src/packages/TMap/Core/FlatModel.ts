@@ -40,7 +40,7 @@ class FlatModel extends Actor {
 
     public override Destroy() {
         const fm = toRaw(this)
-        this.O.map.V.imageryLayers.remove(fm.layer)
+        fm.O.map.V.imageryLayers.remove(fm.layer)
     }
 }
 
