@@ -354,6 +354,21 @@ class TourPath extends Actor {
         return result
     }
 
+    private GetNearest(result: Array<Cesium.Cartesian3>) {
+        const tp = toRaw(this)
+        if (tp.O.position) {
+            const start = Cesium.Cartesian3.distance(tp.O.position, result[0])
+            const end = Cesium.Cartesian3.distance(tp.O.position, result[result.length - 1])
+            if (start > end) {
+                result.push(tp.O.position)
+            }
+            else {
+                result.unshift(tp.O.position)
+            }
+        }
+        return result
+    }
+
     private GetWay(s: { minLngIndex: number, maxLngIndex: number, minLatIndex: number, maxLatIndex: number }, bound: Array<Cesium.Cartesian3>, direction: { r: Cesium.Cartesian3, p: Cesium.Cartesian3, s: Cesium.Cartesian3, l: number, d: number }) {
         const tp = toRaw(this)
 
@@ -386,7 +401,7 @@ class TourPath extends Actor {
             }
         }
 
-        return result
+        return tp.GetNearest(result)
     }
 
     public OnDragging(e: Cesium.Cartesian3, id: string, name: string): void {
