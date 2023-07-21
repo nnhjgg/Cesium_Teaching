@@ -8,14 +8,6 @@ namespace TMap {
          */
         container: HTMLElement,
         /**
-         * 地形地址
-         */
-        terrainUrl?: string,
-        /**
-         * 是否在线
-         */
-        online?: boolean,
-        /**
          * 地图类型
          */
         type: Cesium.SceneMode.SCENE2D | Cesium.SceneMode.SCENE3D,
@@ -187,6 +179,12 @@ namespace TMap {
         roll?: number;
         color?: string
         outlineColor?: string
+    }
+
+    export interface IClippingPlane extends IActor {
+        polyline: Array<Cesium.Cartesian3>,
+        color?: string,
+        width?: number
     }
 
     export interface ISimpleAlong {

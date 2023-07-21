@@ -12,6 +12,7 @@ import { ImageryProvider } from "./ImageryProvider";
 import { VideoLayer } from "./VideoLayer";
 import { TourPath } from "./TourPath";
 import { Frustum } from "./Frustum";
+import { ClippingPlane } from "./ClippingPlane";
 
 export {
     Actor,
@@ -28,4 +29,5 @@ export {
     VideoLayer,
     TourPath,
     Frustum,
+    ClippingPlane
 }

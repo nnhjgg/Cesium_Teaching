@@ -83,15 +83,11 @@ class TMapViewer extends EventSystem {
             targetFrameRate: this.options.targetFrameRate || 60,
             orderIndependentTranslucency: true,
             automaticallyTrackDataSourceClocks: false,
-            // terrainShadows: Cesium.ShadowMode.DISABLED,
-            terrainProvider: this.options.terrainUrl ? new Cesium.CesiumTerrainProvider({
-                url: this.options.terrainUrl
-            }) : undefined,
             projectionPicker: false,
             requestRenderMode: false,
         })
 
-        if (this.options.online == undefined || this.options.online == true) {
+        if (Config.mapType == 0) {
             const v1 = new ImageryProvider({
                 map: this,
                 url: 'https://webrd02.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
@@ -138,6 +134,8 @@ class TMapViewer extends EventSystem {
         this.viewer.scene.debugShowFramesPerSecond = false
         this.viewer.scene.postProcessStages.fxaa.enabled = false
         this.viewer.scene.globe.depthTestAgainstTerrain = true
+        this.viewer.scene.globe.backFaceCulling = true;
+        this.viewer.scene.globe.showSkirts = false;
     }
 
     private InitController() {

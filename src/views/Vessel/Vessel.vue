@@ -15,8 +15,8 @@ instance.Run()
 <template>
     <div class="Vessel">
         <span class="Map" ref="dom"></span>
-        <video class="Video" ref="video" muted autoplay loop crossorigin="" controls src="/Resource/Ma.mp4">
-        </video>
+        <!-- <video class="Video" ref="video" muted autoplay loop crossorigin="" controls src="/Resource/Ma.mp4">
+        </video> -->
     </div>
 </template>
 
