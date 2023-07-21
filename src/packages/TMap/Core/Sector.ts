@@ -67,12 +67,18 @@ class Sector extends Actor {
         const lngD = a[0] - r.R
         const latD = b[1] - r.Q
 
-        path.push(sector.O.position || Cesium.Cartesian3.ZERO)
+        if (sector.O.angle != 360) {
+            path.push(sector.O.position || Cesium.Cartesian3.ZERO)
+        }
+
         for (let i = 0; i < ((sector.O.angle || 360) + 1); i++) {
             const ll = [r.R + lngD * Math.sin(Sector.once * (i + (sector.O.offset || 0))), r.Q + latD * Math.cos(Sector.once * (i + (sector.O.offset || 0)))]
             path.push(sector.O.map.GetC3FromLngLat(ll[0], ll[1], r.H))
         }
-        path.push(sector.O.position || Cesium.Cartesian3.ZERO)
+        if (sector.O.angle != 360) {
+            path.push(sector.O.position || Cesium.Cartesian3.ZERO)
+        }
+
         return path
     }
 
