@@ -1,5 +1,6 @@
 import { Actor } from "./Actor";
 import { Point } from "./Point";
+import { SingleLine } from "./SingleLine";
 import { Line } from "./Line";
 import { Rect } from "./Rect";
 import { Text } from './Text'
@@ -13,10 +14,12 @@ import { VideoLayer } from "./VideoLayer";
 import { TourPath } from "./TourPath";
 import { Frustum } from "./Frustum";
 import { ClippingPlane } from "./ClippingPlane";
+import { Semicircle } from "./Semicircle";
 
 export {
     Actor,
     Point,
+    SingleLine,
     Line,
     Rect,
     Text,
@@ -29,5 +32,6 @@ export {
     VideoLayer,
     TourPath,
     Frustum,
-    ClippingPlane
+    Semicircle,
+    ClippingPlane,
 }

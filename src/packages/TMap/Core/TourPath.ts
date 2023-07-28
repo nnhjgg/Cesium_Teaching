@@ -407,12 +407,10 @@ class TourPath extends Actor {
     public OnDragging(e: Cesium.Cartesian3, id: string, name: string): void {
         const tp = toRaw(this)
         if (name == 'TourPathPoint') {
-            if (tp.O.dragable == undefined || tp.O.dragable) {
-                const point = tp.points.find(p => p.id == id)
-                if (point) {
-                    point.position = e as unknown as Cesium.PositionProperty
-                    tp.UpdatePath()
-                }
+            const point = tp.points.find(p => p.id == id)
+            if (point) {
+                point.position = e as unknown as Cesium.PositionProperty
+                tp.UpdatePath()
             }
         }
     }
@@ -420,10 +418,8 @@ class TourPath extends Actor {
     public OnDraggingEnd(e: Cesium.Cartesian3, id: string, name: string): void {
         const tp = toRaw(this)
         if (name == 'TourPathPoint') {
-            if (tp.O.dragable == undefined || tp.O.dragable) {
-                tp.OnDragging(e, id, name)
-                tp.UpdateTourPath()
-            }
+            tp.OnDragging(e, id, name)
+            tp.UpdateTourPath()
         }
     }
 }

@@ -117,14 +117,14 @@ class Vessel extends AActor {
         //     video: this.video.value as HTMLVideoElement
         // })
 
-        // const tp = new TMap.Core.TourPath({
-        //     map: this.viewer,
-        //     turnExtend: 50,
-        //     turnPadding: 50,
-        //     rotate: 70,
-        //     position: this.viewer.GetC3FromLngLat(117.225, 31.822, 100),
-        //     polyline: [this.viewer.GetC3FromLngLat(117.221, 31.820, 100), this.viewer.GetC3FromLngLat(117.224, 31.817, 100), this.viewer.GetC3FromLngLat(117.229, 31.820, 100), this.viewer.GetC3FromLngLat(117.227, 31.821, 100)]
-        // })
+        const tp = new TMap.Core.TourPath({
+            map: this.viewer,
+            turnExtend: 50,
+            turnPadding: 50,
+            rotate: 70,
+            position: this.viewer.GetC3FromLngLat(117.225, 31.822, 100),
+            polyline: [this.viewer.GetC3FromLngLat(117.221, 31.820, 100), this.viewer.GetC3FromLngLat(117.224, 31.817, 100), this.viewer.GetC3FromLngLat(117.229, 31.820, 100), this.viewer.GetC3FromLngLat(117.227, 31.821, 100)]
+        })
     }
 
     private CreateSViewer() {

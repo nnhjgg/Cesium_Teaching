@@ -49,10 +49,8 @@ class VideoLayer extends Actor {
 
     public override OnDragging(e: Cesium.Cartesian3, id: string, name: string): void {
         const vl = toRaw(this)
-        if (vl.O.dragable == undefined || vl.O.dragable) {
-            if (name == 'VideoLayerRoot') {
-                vl.ChangePosition(e)
-            }
+        if (name == 'VideoLayerRoot') {
+            vl.ChangePosition(e)
         }
     }
 

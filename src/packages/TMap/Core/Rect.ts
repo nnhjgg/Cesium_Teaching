@@ -197,12 +197,10 @@ class Rect extends Actor {
             }
         }
         else if (name == 'RectPoint') {
-            if (rect.O.dragable == undefined || rect.O.dragable) {
-                const point = rect.points.find(p => p.id == id)
-                if (point) {
-                    point.position = e as unknown as Cesium.PositionProperty
-                    rect.UpdateRectPath()
-                }
+            const point = rect.points.find(p => p.id == id)
+            if (point) {
+                point.position = e as unknown as Cesium.PositionProperty
+                rect.UpdateRectPath()
             }
         }
     }

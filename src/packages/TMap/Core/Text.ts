@@ -54,10 +54,8 @@ class Text extends Actor {
 
     public override OnDragging(e: Cesium.Cartesian3, id: string, name: string): void {
         const text = toRaw(this)
-        if (text.O.dragable == undefined || text.O.dragable) {
-            if (name == 'TextRoot') {
-                text.ChangePosition(e)
-            }
+        if (name == 'TextRoot') {
+            text.ChangePosition(e)
         }
     }
 

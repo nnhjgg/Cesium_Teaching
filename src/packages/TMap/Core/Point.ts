@@ -50,10 +50,8 @@ class Point extends Actor {
 
     public override OnDragging(e: Cesium.Cartesian3, id: string, name: string): void {
         const point = toRaw(this)
-        if (point.O.dragable == undefined || point.O.dragable) {
-            if (name == 'PointRoot') {
-                point.ChangePosition(e)
-            }
+        if (name == 'PointRoot') {
+            point.ChangePosition(e)
         }
     }
 

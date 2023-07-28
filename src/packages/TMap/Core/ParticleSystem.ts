@@ -84,10 +84,8 @@ class ParticleSystem extends Actor {
 
     public override OnDragging(e: Cesium.Cartesian3, id: string, name: string): void {
         const ps = toRaw(this)
-        if (ps.O.dragable == undefined || ps.O.dragable) {
-            if (name == 'ParticleSystemRoot') {
-                ps.ChangePosition(e)
-            }
+        if (name == 'ParticleSystemRoot') {
+            ps.ChangePosition(e)
         }
     }
 

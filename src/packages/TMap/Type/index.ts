@@ -19,6 +19,10 @@ namespace TMap {
          * 目标事件触发间隔 [ 5 ]
          */
         draggingThreshold?: number,
+        /**
+         * 默认展示地图类型
+         */
+        defaultMapType?: BaseMapType,
         OnLeftClick?: (e: Cesium.ScreenSpaceEventHandler.PositionedEvent) => void,
         OnMidClick?: (e: Cesium.ScreenSpaceEventHandler.PositionedEvent) => void,
         OnMidDown?: (e: Cesium.ScreenSpaceEventHandler.PositionedEvent) => void,
@@ -45,10 +49,16 @@ namespace TMap {
 
     export interface ITMapImageryProvider {
         url: string,
-        crs: Coordinate
+        crs: Coordinate,
+        brightness?: number,
+        contrast?: number,
+        hue?: number,
+        saturation?: number,
+        gamma?: number,
     }
 
     export enum BaseMapType {
+        None,
         /**
          * 矢量地图
          */
@@ -87,10 +97,13 @@ namespace TMap {
         scale?: number
     }
 
-    export interface ILine extends IActor {
+    export interface ISingleLine extends IActor {
         polyline: Array<Cesium.Cartesian3>
         width?: number
         color?: string,
+    }
+
+    export interface ILine extends ISingleLine {
         pointScale?: number,
         /**
          * 是否可整体拖拽 [ false ]
@@ -125,12 +138,28 @@ namespace TMap {
     }
 
     export interface ISector extends IActor {
+        /**
+         * 中心位置
+         */
+        position: Cesium.Cartesian3,
         radius?: number,
         offset?: number,
         angle?: number
         color?: string,
         fillColor?: string,
-        width?: number
+        width?: number,
+        icon?: string,
+        iconScale?: number
+    }
+
+    export interface ISemicircle extends IActor {
+        lng: number,
+        lat: number,
+        radius: Array<number>,
+        height: number,
+        icon?: string,
+        iconScale?: number,
+        rotate?: number
     }
 
     type ImageryProvider = IActor & ITMapImageryProvider

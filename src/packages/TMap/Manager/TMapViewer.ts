@@ -12,7 +12,7 @@ class TMapViewer extends EventSystem {
         this.InitHandler()
     }
 
-    static entityMutually = ['PointRoot', 'LineRoot', 'LinePoint', 'RectRoot', 'RectPoint', 'TextRoot', 'ParticleSystemRoot', 'SectorRoot', 'VideoLayerRoot', 'TourPathPoint']
+    static entityMutually = ['PointRoot', 'LineRoot', 'LinePoint', 'RectRoot', 'RectPoint', 'TextRoot', 'ParticleSystemRoot', 'SemicircleRoot', 'VideoLayerRoot', 'TourPathPoint']
 
     static primitiveMutually = ['GltfModelRoot']
 
@@ -36,9 +36,9 @@ class TMapViewer extends EventSystem {
 
     private currentLayer = TMap.BaseMapType.Sate
 
-    private vectorMap: Array<ImageryProvider> = []
+    public vectorMap: Array<ImageryProvider> = []
 
-    private sateMap: Array<ImageryProvider> = []
+    public sateMap: Array<ImageryProvider> = []
 
     /**
      * 容器原始对象
@@ -77,7 +77,6 @@ class TMapViewer extends EventSystem {
                 }
             },
             sceneMode: this.options.type,
-            // mapMode2D: Cesium.MapMode2D.ROTATE,
             shadows: false,
             showRenderLoopErrors: false,
             targetFrameRate: this.options.targetFrameRate || 60,
@@ -128,14 +127,13 @@ class TMapViewer extends EventSystem {
             })
             this.sateMap.push(s1, s2)
         }
-
-        this.SwitchBaseMapType()
+        this.SwitchBaseMapType(this.options.defaultMapType || TMap.BaseMapType.None)
 
         this.viewer.scene.debugShowFramesPerSecond = false
         this.viewer.scene.postProcessStages.fxaa.enabled = false
         this.viewer.scene.globe.depthTestAgainstTerrain = true
-        this.viewer.scene.globe.backFaceCulling = true;
-        this.viewer.scene.globe.showSkirts = false;
+        // this.viewer.scene.globe.backFaceCulling = true;
+        // this.viewer.scene.globe.showSkirts = false;
     }
 
     private InitController() {
@@ -283,8 +281,8 @@ class TMapViewer extends EventSystem {
     /**
      * 根据世界坐标得到屏幕坐标
      */
-    public GetWindowPositionFromC3(scene: Cesium.Scene, c3: Cesium.Cartesian3) {
-        return Cesium.SceneTransforms.wgs84ToWindowCoordinates(scene, c3);
+    public GetWindowPositionFromC3(c3: Cesium.Cartesian3) {
+        return Cesium.SceneTransforms.wgs84ToWindowCoordinates(this.viewer.scene, c3);
     }
 
     /**
@@ -319,23 +317,43 @@ class TMapViewer extends EventSystem {
     /**
      * 切换地图底图
      */
-    public SwitchBaseMapType() {
-        if (this.currentLayer == TMap.BaseMapType.Vector) {
-            this.currentLayer = TMap.BaseMapType.Sate
-            for (let v of this.vectorMap) {
-                v.Hide()
+    public SwitchBaseMapType(type: TMap.BaseMapType = TMap.BaseMapType.None) {
+        if (type == TMap.BaseMapType.None) {
+            if (this.currentLayer == TMap.BaseMapType.Vector) {
+                this.currentLayer = TMap.BaseMapType.Sate
+                for (let v of this.vectorMap) {
+                    v.Hide()
+                }
+                for (let s of this.sateMap) {
+                    s.Show()
+                }
             }
-            for (let s of this.sateMap) {
-                s.Show()
+            else if (this.currentLayer == TMap.BaseMapType.Sate) {
+                this.currentLayer = TMap.BaseMapType.Vector
+                for (let v of this.vectorMap) {
+                    v.Show()
+                }
+                for (let s of this.sateMap) {
+                    s.Hide()
+                }
             }
         }
-        else if (this.currentLayer == TMap.BaseMapType.Sate) {
+        else if (type == TMap.BaseMapType.Vector) {
             this.currentLayer = TMap.BaseMapType.Vector
             for (let v of this.vectorMap) {
                 v.Show()
             }
             for (let s of this.sateMap) {
                 s.Hide()
+            }
+        }
+        else if (type == TMap.BaseMapType.Sate) {
+            this.currentLayer = TMap.BaseMapType.Sate
+            for (let v of this.vectorMap) {
+                v.Hide()
+            }
+            for (let s of this.sateMap) {
+                s.Show()
             }
         }
     }
@@ -352,7 +370,6 @@ class TMapViewer extends EventSystem {
         const p = this.GetPositionPick(e.position)
         if (p) {
             if (p.type == TMap.PickType.Entity) {
-                Debug.Log(p.target.entity.body)
                 if (TMapViewer.entityMutually.indexOf(p.target.entity.type) != -1 && p.target.entity.body.sign == 'Core') {
                     this.currentFocus.type = p.target.entity.type
                     this.currentFocus.actor = p.target.entity.body
@@ -395,21 +412,25 @@ class TMapViewer extends EventSystem {
         if (p) {
             if (p.type == TMap.PickType.Entity) {
                 if (TMapViewer.entityMutually.indexOf(p.target.entity.type) != -1 && p.target.entity.body.sign == 'Core') {
+                    const actor = p.target.entity.body as Actor
+                    if (actor.options.dragable == undefined || actor.options.dragable) {
+                        this.DisableMapMove()
+                    }
                     this.currentFocus.type = p.target.entity.type
                     this.currentFocus.actor = p.target.entity.body
                     this.currentFocus.origin = p.target.entity
-                    this.DisableMapMove()
-                    const actor = p.target.entity.body as Actor
                     actor.OnMouseDown(p.c3, p.target.entity.id || '', p.target.entity.type)
                 }
             }
             else if (p.type == TMap.PickType.Primitive) {
                 if (TMapViewer.primitiveMutually.indexOf(p.target.primitive.type) != -1 && p.target.primitive.body.sign == 'Core') {
+                    const actor = p.target.primitive.body as Actor
+                    if (actor.options.dragable == undefined || actor.options.dragable) {
+                        this.DisableMapMove()
+                    }
                     this.currentFocus.type = p.target.primitive.type
                     this.currentFocus.actor = p.target.primitive.body
                     this.currentFocus.origin = p.target.primitive
-                    this.DisableMapMove()
-                    const actor = p.target.primitive.body as Actor
                     actor.OnMouseDown(p.c3, p.target.primitive.id || '', p.target.primitive.type)
                 }
             }
@@ -424,7 +445,9 @@ class TMapViewer extends EventSystem {
                 const actor = this.currentFocus.actor as Actor
                 actor.OnMouseUp(this.GetC3FromWindowPosition(e.position), this.currentFocus.origin.id || '', this.currentFocus.type)
                 if (this.isDragging) {
-                    actor.OnDraggingEnd(this.GetC3FromWindowPosition(e.position), this.currentFocus.origin.id || '', this.currentFocus.type)
+                    if (actor.options.dragable == undefined || actor.options.dragable) {
+                        actor.OnDraggingEnd(this.GetC3FromWindowPosition(e.position), this.currentFocus.origin.id || '', this.currentFocus.type)
+                    }
                 }
             }
         }
@@ -465,11 +488,15 @@ class TMapViewer extends EventSystem {
             if (TMapViewer.entityMutually.indexOf(this.currentFocus.type) != -1 || TMapViewer.primitiveMutually.indexOf(this.currentFocus.type) != -1) {
                 const actor = this.currentFocus.actor as Actor
                 if (!this.isDragging) {
-                    actor.OnDraggingStart(this.GetC3FromWindowPosition(e.endPosition), this.currentFocus.origin.id || '', this.currentFocus.type)
-                    this.isDragging = true
+                    if (actor.options.dragable == undefined || actor.options.dragable) {
+                        actor.OnDraggingStart(this.GetC3FromWindowPosition(e.endPosition), this.currentFocus.origin.id || '', this.currentFocus.type)
+                        this.isDragging = true
+                    }
                 }
                 else {
-                    actor.OnDragging(this.GetC3FromWindowPosition(e.endPosition), this.currentFocus.origin.id || '', this.currentFocus.type)
+                    if (actor.options.dragable == undefined || actor.options.dragable) {
+                        actor.OnDragging(this.GetC3FromWindowPosition(e.endPosition), this.currentFocus.origin.id || '', this.currentFocus.type)
+                    }
                 }
             }
         }

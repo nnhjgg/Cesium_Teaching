@@ -194,12 +194,10 @@ class Line extends Actor {
             }
         }
         else if (name == 'LinePoint') {
-            if (line.O.dragable == undefined || line.O.dragable) {
-                const point = line.points.find(p => p.id == id)
-                if (point) {
-                    point.position = e as unknown as Cesium.PositionProperty
-                    line.UpdateLinePath()
-                }
+            const point = line.points.find(p => p.id == id)
+            if (point) {
+                point.position = e as unknown as Cesium.PositionProperty
+                line.UpdateLinePath()
             }
         }
     }

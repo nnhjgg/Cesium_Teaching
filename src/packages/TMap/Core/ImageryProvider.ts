@@ -10,7 +10,7 @@ class ImageryProvider extends Actor {
         this.CreateRoot()
     }
 
-    private layer!: Cesium.ImageryLayer
+    public layer!: Cesium.ImageryLayer
 
     private get O() {
         return this.options as TMap.IImageryProvider

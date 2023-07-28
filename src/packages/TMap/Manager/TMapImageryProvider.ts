@@ -74,6 +74,11 @@ class TMapImageryProvider extends Cesium.UrlTemplateImageryProvider {
             maximumLevel: 18,
             subdomains: TMapImageryProvider.subdomains,
         })
+        this.defaultBrightness = options.brightness
+        this.defaultContrast = options.contrast
+        this.defaultHue = options.hue
+        this.defaultSaturation = options.saturation
+        this.defaultGamma = options.gamma
     }
 
     static subdomains = ['0', '1', '2', '3', '4', '5', '6', '7']
