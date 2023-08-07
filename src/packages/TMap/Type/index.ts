@@ -16,10 +16,6 @@ namespace TMap {
          */
         targetFrameRate?: number,
         /**
-         * 目标事件触发间隔 [ 5 ]
-         */
-        draggingThreshold?: number,
-        /**
          * 默认展示地图类型
          */
         defaultMapType?: BaseMapType,
@@ -166,6 +162,10 @@ namespace TMap {
 
     export interface IImageryProvider extends ImageryProvider {
 
+    }
+
+    export interface ITerrainProvider extends IActor {
+        url: string
     }
 
     export interface IGltfModel extends IActor {

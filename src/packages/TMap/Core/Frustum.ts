@@ -123,12 +123,15 @@ class Frustum extends Actor {
         frustum.outline.show = false
     }
 
+    public override Foucs(): void {
+
+    }
+
     public override Destroy() {
         const frustum = toRaw(this)
         frustum.O.map.V.scene.primitives.remove(frustum.geo)
         frustum.O.map.V.scene.primitives.remove(frustum.outline)
     }
-
 }
 
 export { Frustum }

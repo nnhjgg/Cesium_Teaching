@@ -42,6 +42,11 @@ class FlatModel extends Actor {
         const fm = toRaw(this)
         fm.O.map.V.imageryLayers.remove(fm.layer)
     }
+
+    public override Foucs(): void {
+        const fm = toRaw(this)
+        this.O.map.V.zoomTo(this.layer)
+    }
 }
 
 export { FlatModel }

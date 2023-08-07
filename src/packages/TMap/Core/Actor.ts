@@ -46,6 +46,8 @@ abstract class Actor {
 
     public abstract Destroy(): void
 
+    public abstract Foucs(): void
+
     public SwitchVisibility() {
         const a = toRaw(this)
         if (a.show.value) {
@@ -55,6 +57,7 @@ abstract class Actor {
             a.Show()
         }
     }
+
 
     /**
      * 鼠标左键点击时

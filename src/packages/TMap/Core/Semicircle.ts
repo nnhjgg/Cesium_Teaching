@@ -10,6 +10,8 @@ class Semicircle extends Actor {
         this.CreateRoot()
     }
 
+    private area!: Cesium.Entity
+
     private get O() {
         return this.options as TMap.ISemicircle
     }
@@ -18,6 +20,7 @@ class Semicircle extends Actor {
 
     public Destroy() {
         this.O.map.V.entities.remove(this.root)
+        this.O.map.V.entities.remove(this.area)
     }
 
     public CreateRoot() {
@@ -32,20 +35,15 @@ class Semicircle extends Actor {
                 scale: this.O.iconScale || 1,
                 disableDepthTestDistance: 50000,
             },
-            label: {
-                show: false,
-                text: '',
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                fillColor: Cesium.Color.WHITE,
-                font: '15px sans-serif',
-                pixelOffset: new Cesium.Cartesian2(0, 28),
-                eyeOffset: new Cesium.Cartesian3(0, 0.4, 0), // 文字上升一段距离(米)
-                showBackground: true,
-                backgroundColor: new Cesium.Color(0.0, 0.0, 0.0, 0.6),
-                backgroundPadding: new Cesium.Cartesian2(10, 6),
-                horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
-                disableDepthTestDistance: 50000,
-            },
+        })
+
+        //@ts-ignore
+        this.root.type = 'SemicircleRoot'
+        //@ts-ignore
+        this.root.body = this
+
+        this.area = this.O.map.V.entities.add({
+            name: "SemicircleArea",
             polyline: {
                 positions: path,
                 width: 3,
@@ -63,10 +61,9 @@ class Semicircle extends Actor {
         })
 
         //@ts-ignore
-        this.root.type = 'SemicircleRoot'
+        this.area.type = 'SemicircleArea'
         //@ts-ignore
-        this.root.body = this
-
+        this.area.body = this
     }
 
     private GetSemicirclePath() {
@@ -90,12 +87,18 @@ class Semicircle extends Actor {
         const s = toRaw(this)
         s.show.value = true
         s.root.show = true
+        s.area.show = true
     }
 
     public Hide(): void {
         const s = toRaw(this)
         s.show.value = false
         s.root.show = false
+        s.area.show = false
+    }
+
+    public override Foucs(): void {
+
     }
 }
 

@@ -12,7 +12,7 @@ class TMapViewer extends EventSystem {
         this.InitHandler()
     }
 
-    static entityMutually = ['PointRoot', 'LineRoot', 'LinePoint', 'RectRoot', 'RectPoint', 'TextRoot', 'ParticleSystemRoot', 'SemicircleRoot', 'VideoLayerRoot', 'TourPathPoint']
+    static entityMutually = ['PointRoot', 'LineRoot', 'LinePoint', 'RectRoot', 'RectPoint', 'TextRoot', 'ParticleSystemRoot', 'SectorRoot', 'SemicircleRoot', 'VideoLayerRoot', 'TourPathPoint']
 
     static primitiveMutually = ['GltfModelRoot']
 
@@ -31,8 +31,6 @@ class TMapViewer extends EventSystem {
     private isDragging = false
 
     private isDown = false
-
-    private draggingDelta = -1
 
     private currentLayer = TMap.BaseMapType.Sate
 
@@ -219,7 +217,7 @@ class TMapViewer extends EventSystem {
 
         this.handler.setInputAction(
             (e: Cesium.ScreenSpaceEventHandler.MotionEvent) => {
-                this.OnMovePre(e)
+                this.OnMove(e)
             },
             Cesium.ScreenSpaceEventType.MOUSE_MOVE,
         )
@@ -237,10 +235,21 @@ class TMapViewer extends EventSystem {
         return { R, Q, H: cartographic.height }
     }
 
+    public static GetLngLatFromC3(c3: Cesium.Cartesian3) {
+        let cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(c3)
+        let R = Cesium.Math.toDegrees(cartographic.longitude)
+        let Q = Cesium.Math.toDegrees(cartographic.latitude)
+        return { R, Q, H: cartographic.height }
+    }
+
     /**
      * 获取c3 ( 输入经纬度 )
      */
     public GetC3FromLngLat(lng: number, lat: number, height?: number) {
+        return Cesium.Cartesian3.fromDegrees(lng, lat, height)
+    }
+
+    public static GetC3FromLngLat(lng: number, lat: number, height?: number) {
         return Cesium.Cartesian3.fromDegrees(lng, lat, height)
     }
 
@@ -285,12 +294,21 @@ class TMapViewer extends EventSystem {
         return Cesium.SceneTransforms.wgs84ToWindowCoordinates(this.viewer.scene, c3);
     }
 
+    public static GetWindowPositionFromC3(map: TMapViewer, c3: Cesium.Cartesian3) {
+        return Cesium.SceneTransforms.wgs84ToWindowCoordinates(map.V.scene, c3);
+    }
+
     /**
      * 根据屏幕坐标得到世界坐标
      */
     public GetC3FromWindowPosition(wp: Cesium.Cartesian2) {
         return this.viewer.scene.globe.pick(this.viewer.camera.getPickRay(wp) as Cesium.Ray, this.viewer.scene) as Cesium.Cartesian3
     }
+
+    public static GetC3FromWindowPosition(map: TMapViewer, wp: Cesium.Cartesian2) {
+        return map.V.scene.globe.pick(map.V.camera.getPickRay(wp) as Cesium.Ray, map.V.scene) as Cesium.Cartesian3
+    }
+
 
     /**
      * 禁止地图移动
@@ -469,18 +487,6 @@ class TMapViewer extends EventSystem {
 
     private OnRightUp(e: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
         this.options.OnRightUp && this.options.OnRightUp(e)
-    }
-
-    private OnMovePre(e: Cesium.ScreenSpaceEventHandler.MotionEvent) {
-        if (this.isDown) {
-            if (this.draggingDelta < 0) {
-                this.OnMove(e)
-            }
-            this.draggingDelta++
-            if (this.draggingDelta > (this.options.draggingThreshold || 5)) {
-                this.draggingDelta = -1
-            }
-        }
     }
 
     private OnMove(e: Cesium.ScreenSpaceEventHandler.MotionEvent) {

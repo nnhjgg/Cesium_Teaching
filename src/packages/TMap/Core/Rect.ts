@@ -23,13 +23,16 @@ class Rect extends Actor {
         this.root = this.O.map.V.entities.add({
             name: "RectRoot",
             polyline: {
-                positions: this.O.polyline.length != 0 ? [...this.O.polyline, this.O.polyline[0]] : this.O.polyline,
+                positions: new Cesium.CallbackProperty(() => {
+                    return this.O.polyline.length != 0 ? [...this.O.polyline, this.O.polyline[0]] : this.O.polyline
+                }, false),
                 width: this.O.width || 5,
                 material: Cesium.Color.fromCssColorString(this.O.color || '#ff0000'),
             },
             polygon: {
-                //@ts-ignore
-                hierarchy: this.O.polyline,
+                hierarchy: new Cesium.CallbackProperty(() => {
+                    return new Cesium.PolygonHierarchy(this.O.polyline)
+                }, false),
                 perPositionHeight: true,
                 outline: false,
                 material: Cesium.Color.fromCssColorString(this.O.fillColor || '#ff000066'),
@@ -81,6 +84,10 @@ class Rect extends Actor {
         for (let p of rect.points) {
             p.show = false
         }
+    }
+
+    public override Foucs(): void {
+
     }
 
     public override Destroy() {
@@ -153,12 +160,7 @@ class Rect extends Actor {
     public UpdateRectPath() {
         const rect = toRaw(this)
         const path = rect.GetRectPath()
-        const r = [...path, path[0]]
         rect.O.polyline = path
-        //@ts-ignore
-        rect.root.polyline.positions = r
-        //@ts-ignore
-        rect.root.polygon.hierarchy = path
     }
 
     public ChangeSideColor(color: string) {

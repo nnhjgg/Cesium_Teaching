@@ -66,6 +66,10 @@ class SingleLine extends Actor {
         //@ts-ignore
         sl.root.polyline.material = Cesium.Color.fromCssColorString(color)
     }
+
+    public override Foucs(): void {
+
+    }
 }
 
 export { SingleLine }

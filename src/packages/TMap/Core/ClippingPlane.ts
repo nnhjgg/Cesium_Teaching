@@ -80,6 +80,10 @@ class ClippingPlane extends Actor {
         //@ts-ignore
         cp.O.map.V.scene.globe.clippingPlanes = undefined
     }
+
+    public override Foucs(): void {
+
+    }
 }
 
 export { ClippingPlane }

@@ -24,7 +24,9 @@ class TourPath extends Actor {
         this.root = this.O.map.V.entities.add({
             name: "TourPathRoot",
             polyline: {
-                positions: this.O.polyline.length != 0 ? [...this.O.polyline, this.O.polyline[0]] : this.O.polyline,
+                positions: new Cesium.CallbackProperty(() => {
+                    return this.O.polyline.length != 0 ? [...this.O.polyline, this.O.polyline[0]] : this.O.polyline
+                }, false),
                 width: this.O.width || 5,
                 material: Cesium.Color.fromCssColorString(this.O.color || '#ff0000'),
             },
@@ -93,6 +95,10 @@ class TourPath extends Actor {
         }
     }
 
+    public override Foucs(): void {
+
+    }
+
     public override Destroy() {
         const tp = toRaw(this)
         tp.O.map.V.entities.remove(tp.root)
@@ -154,8 +160,6 @@ class TourPath extends Actor {
         const tp = toRaw(this)
         const path = tp.GetPointPath()
         tp.O.polyline = path
-        //@ts-ignore
-        tp.root.polyline.positions = [...path, path[0]]
     }
 
     private UpdateTourPath() {

@@ -10,6 +10,7 @@ import { TileModel } from "./TileModel";
 import { GltfModel } from "./GltfModel";
 import { Sector } from "./Sector";
 import { ImageryProvider } from "./ImageryProvider";
+import { TerrainProvider } from "./TerrainProvider";
 import { VideoLayer } from "./VideoLayer";
 import { TourPath } from "./TourPath";
 import { Frustum } from "./Frustum";
@@ -34,4 +35,5 @@ export {
     Frustum,
     Semicircle,
     ClippingPlane,
+    TerrainProvider,
 }

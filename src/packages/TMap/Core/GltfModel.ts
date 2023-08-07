@@ -52,6 +52,10 @@ class GltfModel extends Actor {
         gm.gltf.show = false
     }
 
+    public override Foucs(): void {
+
+    }
+
     public Destroy(): void {
         const gm = toRaw(this)
         gm.O.map.V.scene.primitives.remove(gm.gltf)

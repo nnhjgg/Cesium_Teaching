@@ -43,6 +43,10 @@ class Point extends Actor {
         point.root.show = false
     }
 
+    public override Foucs(): void {
+
+    }
+
     public override Destroy() {
         const point = toRaw(this)
         point.O.map.V.entities.remove(point.root)

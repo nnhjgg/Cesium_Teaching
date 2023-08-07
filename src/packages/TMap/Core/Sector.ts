@@ -10,26 +10,33 @@ class Sector extends Actor {
         this.CreateRoot()
     }
 
+    private path: Array<Cesium.Cartesian3> = []
+
     static once = (Math.PI * 2) / 360
 
     private center!: Cesium.Entity
+
+    private downPosition!: Cesium.Cartesian3
 
     private get O() {
         return this.options as TMap.ISector
     }
 
     public override CreateRoot() {
-        const path = this.GeneratePath()
+        this.path = this.GeneratePath()
         this.root = this.O.map.V.entities.add({
             name: "SectorRoot",
             polyline: {
-                positions: [...path, path[0]],
+                positions: new Cesium.CallbackProperty(() => {
+                    return [...this.path, this.path[0]]
+                }, false),
                 width: this.O.width || 5,
                 material: Cesium.Color.fromCssColorString(this.O.color || '#ff0000'),
             },
             polygon: {
-                //@ts-ignore
-                hierarchy: path,
+                hierarchy: new Cesium.CallbackProperty(() => {
+                    return new Cesium.PolygonHierarchy(this.path)
+                }, false),
                 perPositionHeight: true,
                 outline: false,
                 material: Cesium.Color.fromCssColorString(this.O.fillColor || '#ff000066'),
@@ -77,6 +84,10 @@ class Sector extends Actor {
         }
     }
 
+    public override Foucs(): void {
+
+    }
+
     public override Destroy() {
         const sector = toRaw(this)
         sector.O.map.V.entities.remove(sector.root)
@@ -107,6 +118,26 @@ class Sector extends Actor {
         }
 
         return path
+    }
+
+    public override OnDragging(e: Cesium.Cartesian3, id: string, name: string): void {
+        const sector = toRaw(this)
+        if (name == 'SectorRoot') {
+            const delta = Cesium.Cartesian3.subtract(e, sector.downPosition, new Cesium.Cartesian3())
+            sector.O.position = Cesium.Cartesian3.add(sector.O.position, delta, new Cesium.Cartesian3())
+            sector.downPosition = e
+            sector.path = sector.GeneratePath()
+        }
+    }
+
+    public override OnDraggingEnd(e: Cesium.Cartesian3, id: string, name: string): void {
+        const sector = toRaw(this)
+        sector.OnDragging(e, id, name)
+    }
+
+    public override OnMouseDown(e: Cesium.Cartesian3, id: string, name: string): void {
+        const sector = toRaw(this)
+        sector.downPosition = e
     }
 }
 

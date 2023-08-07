@@ -76,6 +76,10 @@ class ParticleSystem extends Actor {
         ps.ps.show = false
     }
 
+    public override Foucs(): void {
+
+    }
+
     public override Destroy() {
         const ps = toRaw(this)
         ps.O.map.V.entities.remove(ps.root)

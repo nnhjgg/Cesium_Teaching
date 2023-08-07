@@ -26,7 +26,9 @@ class Line extends Actor {
         this.root = this.O.map.V.entities.add({
             name: "LineRoot",
             polyline: {
-                positions: this.O.polyline,
+                positions: new Cesium.CallbackProperty(() => {
+                    return this.O.polyline
+                }, false),
                 width: this.O.width || 5,
                 material: Cesium.Color.fromCssColorString(this.O.color || '#ff0000'),
             },
@@ -77,6 +79,10 @@ class Line extends Actor {
         for (let p of line.points) {
             p.show = false
         }
+    }
+
+    public override Foucs(): void {
+
     }
 
     public override Destroy() {
@@ -161,8 +167,6 @@ class Line extends Actor {
         const line = toRaw(this)
         const path = line.GetLinePath()
         line.O.polyline = path
-        //@ts-ignore
-        line.root.polyline.positions = path
     }
 
     public ChangeColor(color: string) {

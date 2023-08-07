@@ -47,6 +47,10 @@ class Text extends Actor {
         text.root.show = false
     }
 
+    public override Foucs(): void {
+
+    }
+
     public override Destroy() {
         const text = toRaw(this)
         text.O.map.V.entities.remove(text.root)

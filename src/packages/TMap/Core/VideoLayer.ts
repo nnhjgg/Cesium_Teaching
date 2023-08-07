@@ -47,6 +47,10 @@ class VideoLayer extends Actor {
         vl.O.map.V.entities.remove(vl.root)
     }
 
+    public override Foucs(): void {
+
+    }
+
     public override OnDragging(e: Cesium.Cartesian3, id: string, name: string): void {
         const vl = toRaw(this)
         if (name == 'VideoLayerRoot') {
